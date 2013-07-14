@@ -1,4 +1,4 @@
-// Boost general library bstream.cpp source file //////////////////////////////
+// Boost general library ibstream.hpp header file /////////////////////////////
 //
 // Copyright (C) 2013 Paul Long.
 //
@@ -10,9 +10,21 @@
 //
 // See http://www.boost.org/libs/bitstream for documentation.
 
-#ifndef BOOST_BITSTREAM_HPP
-#define BOOST_BITSTREAM_HPP
+#ifndef BOOST_BITSTREAM_IBSTREAM_HPP
+#define BOOST_BITSTREAM_IBSTREAM_HPP
 
-#include "boost/bitstream/bstream.hpp"
+#include "boost/bitstream/iob.hpp"
+
+namespace boost {
+
+namespace bitstream {
+
+class ibstream : public iob
+{
+};
+
+} // namespace bitstream
+
+} // namespace boost
 
 #endif

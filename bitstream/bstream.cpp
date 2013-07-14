@@ -1,10 +1,14 @@
+// Boost general library bstream.cpp source file //////////////////////////////
+//
 // Copyright (C) 2013 Paul Long.
 //
 // Use, modification, and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// See http://www.boost.org/libs/bstream for documentation.
+// See http://www.boost.org/ for latest version.
+//
+// See http://www.boost.org/libs/bitstream for documentation.
 
 // Includes ////////////////////////////////////////////////////////////////////
 
@@ -14,7 +18,7 @@
 
 namespace boost {
 
-namespace bstream {
+namespace bitstream {
 
 // Typedefs ////////////////////////////////////////////////////////////////////
 
@@ -746,6 +750,12 @@ operator!() const
     return fail();
 }
 
+ibitstream::
+operator bool() const
+{
+    return !fail();
+}
+
 ibitstream &
 ibitstream::
 setrepeat(size_t repeat)
@@ -872,6 +882,6 @@ ibitstream &operator>>(ibitstream &ibs, const bool &b)
     return ibs;
 }
 
-} // namespace bstream
+} // namespace bitstream
 
 } // namespace boost

@@ -9,7 +9,7 @@
 #include "boost/bstream.hpp"
 #include <cstdint>
 using namespace std;
-using namespace boost::bstream;
+using namespace boost::bitstream;
 bool rtpTest()
 {
     struct {
@@ -41,7 +41,7 @@ bool rtpTest()
             >> setrepeat(extensionLength * sizeof(uint32_t))
             >> rtp.extension.contents;
     }
-    return bin.good() &&
+    return bin &&
         !rtp.padding && !rtp.extension.present &&
         csrcCount.to_ulong() == 0 && rtp.csrcIdentifier.empty() && !rtp.marker && rtp.payloadType.to_ulong() == 8 &&
         rtp.sequenceNumber == 59196 && rtp.timestamp == 13421772 && rtp.ssrcIdentifier == 3435973836 &&

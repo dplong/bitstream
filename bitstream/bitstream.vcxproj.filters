@@ -9,6 +9,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\boost/bitstream">
+      <UniqueIdentifier>{19d41ab4-93c0-4905-a5ca-066c839e9b2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\boost">
+      <UniqueIdentifier>{ac60f064-1351-4593-bfa5-1db43adb6d86}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bstream.cpp">
@@ -27,11 +33,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="boost\bstream\bstream.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="boost\bstream.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\boost</Filter>
+    </ClInclude>
+    <ClInclude Include="boost\bitstream\bstream.hpp">
+      <Filter>Header Files\boost/bitstream</Filter>
+    </ClInclude>
+    <ClInclude Include="boost\bitstream\ibstream.hpp">
+      <Filter>Header Files\boost/bitstream</Filter>
+    </ClInclude>
+    <ClInclude Include="boost\bitstream\iob.hpp">
+      <Filter>Header Files\boost/bitstream</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

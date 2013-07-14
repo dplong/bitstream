@@ -1,10 +1,14 @@
+// Boost general library bstream.hpp header file //////////////////////////////
+//
 // Copyright (C) 2013 Paul Long.
 //
 // Use, modification, and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// See http://www.boost.org/libs/bstream for documentation.
+// See http://www.boost.org/ for latest version.
+//
+// See http://www.boost.org/libs/bitstream for documentation.
 
 ///
 /// This file contains classes for manipulating bits as input streams.
@@ -52,8 +56,8 @@
 /// }
 /// @endcode
 
-#ifndef BOOST_BSTREAM_BSTREAM_HPP
-#define BOOST_BSTREAM_BSTREAM_HPP
+#ifndef BOOST_BITSTREAM_BSTREAM_HPP
+#define BOOST_BITSTREAM_BSTREAM_HPP
 
 // Includes ////////////////////////////////////////////////////////////////////
 
@@ -62,6 +66,7 @@
 #include <cassert>
 #include "boost/typeof/typeof.hpp"
 #include "boost/assert.hpp"
+#include "boost/bitstream/ibstream.hpp"
 
 // This code uses decltype, which is defined in terms of BOOST's type_of. BOOST
 // only knows about C++'s core types, so we have to tell it about streampos.
@@ -70,7 +75,7 @@ BOOST_TYPEOF_REGISTER_TYPE(std::streampos)
 
 namespace boost {
 
-namespace bstream {
+namespace bitstream {
 
 // Constants ///////////////////////////////////////////////////////////////////
 
@@ -389,7 +394,7 @@ private:
 /// however, it could be easily be fleshed out for writing bits, too. For
 /// example, it currently does not support the analogue to the
 /// istringstream::putback method.
-class ibitstream
+class ibitstream : public ibstream
 {
 public:
     ///
@@ -607,7 +612,7 @@ public:
     bitfield gvalue() const;
 
     ///
-    /// Evaluate stream object.
+    /// Evaluate stream object for failure.
     ///
     /// This function returns whether the internal failbit or badbit has been
     /// set for this ibitstream.
@@ -616,6 +621,17 @@ public:
     ///
     /// @return Whether the failbit or badbit has been set.
     bool operator!() const;
+
+    ///
+    /// Evaluate stream object for success.
+    ///
+    /// This function returns whether the internal failbit and badbit are not
+    /// set for this ibitstream.
+    ///
+    /// @note Same as calling !fail(). !bin.fail() is the same as bin.
+    ///
+    /// @return Whether the failbit and badbit are not set.
+    operator bool() const;
 
     ///
     /// Set repeat count for subsequent vector extractions.
@@ -970,7 +986,7 @@ ibitstream &operator>>(ibitstream &ibs, const std::bitset<N> &bs)
     return ibs;
 }
 
-} // namespace bstream
+} // namespace bitstream
 
 } // namespace boost
 
