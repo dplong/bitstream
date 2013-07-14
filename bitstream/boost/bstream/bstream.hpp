@@ -52,8 +52,8 @@
 /// }
 /// @endcode
 
-#ifndef BOOST_BSTREAM_HPP
-#define BOOST_BSTREAM_HPP
+#ifndef BOOST_BSTREAM_BSTREAM_HPP
+#define BOOST_BSTREAM_BSTREAM_HPP
 
 // Includes ////////////////////////////////////////////////////////////////////
 

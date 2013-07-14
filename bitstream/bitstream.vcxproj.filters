@@ -27,7 +27,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bstream.hpp">
+    <ClInclude Include="boost\bstream\bstream.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
