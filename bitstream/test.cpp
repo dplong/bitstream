@@ -6,7 +6,7 @@
 //
 // See http://www.boost.org/libs/bstream for documentation.
 
-#include "boost/bstream/bstream.hpp"
+#include "boost/bstream.hpp"
 #include <cstdint>
 using namespace std;
 using namespace boost::bstream;

@@ -19,6 +19,7 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="boost\bstream.hpp" />
     <ClInclude Include="boost\bstream\bstream.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
