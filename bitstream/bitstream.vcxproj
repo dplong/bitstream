@@ -16,6 +16,7 @@
   <ItemGroup>
     <ClCompile Include="bstream.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

@@ -1,52 +1,82 @@
-#pragma region Includes
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (C) 2013 Paul Long.
+//
+// Use, modification, and distribution is subject to the Boost Software
+// License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//
+// See http://www.boost.org/libs/bstream for documentation.
+
+// Includes ////////////////////////////////////////////////////////////////////
 
 #include "bstream.h"
 
-#pragma endregion
-#pragma region Constants
-////////////////////////////////////////////////////////////////////////////////
+// Constants ///////////////////////////////////////////////////////////////////
 
-#pragma endregion
-#pragma region Typedefs
-////////////////////////////////////////////////////////////////////////////////
+namespace boost {
 
-#pragma endregion
-#pragma region bitbuf
-////////////////////////////////////////////////////////////////////////////////
+namespace bstream {
+
+// Typedefs ////////////////////////////////////////////////////////////////////
+
+// bitbuf //////////////////////////////////////////////////////////////////////
 
 bitbuf::
 bitbuf(std::ios_base::openmode which) :
     m_buffer(NULL), m_gptr(0), m_egptr(INT_MAX), m_eback(0)
 {
-    assert((which & std::ios_base::app) == 0); // Output not support, so can't append.
-    assert((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-    assert((which & std::ios_base::out) == 0); // Output not currently supported.
-    assert((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+}
+
+bitbuf::
+bitbuf(char *buffer, std::streamsize size, std::ios_base::openmode which) :
+    m_buffer(reinterpret_cast<unsigned char *>(buffer)), m_gptr(0), m_egptr(size), m_eback(0)
+{
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
 }
 
 bitbuf::
 bitbuf(signed char *buffer, std::streamsize size, std::ios_base::openmode which) :
     m_buffer(reinterpret_cast<unsigned char *>(buffer)), m_gptr(0), m_egptr(size), m_eback(0)
 {
-    assert(buffer != NULL);
-    assert(size >= 0);
-    assert((which & std::ios_base::app) == 0); // Output not support, so can't append.
-    assert((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-    assert((which & std::ios_base::out) == 0); // Output not currently supported.
-    assert((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
 }
 
 bitbuf::
 bitbuf(unsigned char *buffer, std::streamsize size, std::ios_base::openmode which) :
     m_buffer(buffer), m_gptr(0), m_egptr(size), m_eback(0)
 {
-    assert(buffer != NULL);
-    assert(size >= 0);
-    assert((which & std::ios_base::app) == 0); // Output not support, so can't append.
-    assert((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-    assert((which & std::ios_base::out) == 0); // Output not currently supported.
-    assert((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+}
+
+bitbuf::
+bitbuf(const char *buffer, std::streamsize size, std::ios_base::openmode which) :
+    m_buffer(reinterpret_cast<unsigned char *>(const_cast<char *>(buffer))),
+    m_gptr(0), m_egptr(size), m_eback(0)
+{
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
 }
 
 bitbuf::
@@ -54,24 +84,24 @@ bitbuf(const signed char *buffer, std::streamsize size, std::ios_base::openmode 
     m_buffer(reinterpret_cast<unsigned char *>(const_cast<signed char *>(buffer))),
     m_gptr(0), m_egptr(size), m_eback(0)
 {
-    assert(buffer != NULL);
-    assert(size >= 0);
-    assert((which & std::ios_base::app) == 0); // Output not support, so can't append.
-    assert((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-    assert((which & std::ios_base::out) == 0); // Output not currently supported.
-    assert((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
 }
 
 bitbuf::
 bitbuf(const unsigned char *buffer, std::streamsize size, std::ios_base::openmode which) :
     m_buffer(const_cast<unsigned char *>(buffer)), m_gptr(0), m_egptr(size), m_eback(0)
 {
-    assert(buffer != NULL);
-    assert(size >= 0);
-    assert((which & std::ios_base::app) == 0); // Output not support, so can't append.
-    assert((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-    assert((which & std::ios_base::out) == 0); // Output not currently supported.
-    assert((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
 }
 
 bitbuf::
@@ -98,7 +128,7 @@ std::streampos
 bitbuf::
 pubseekpos(std::streampos position)
 {
-    assert(position >= 0);
+    BOOST_ASSERT(position >= 0);
 
     return seekpos(position);
 }
@@ -107,7 +137,7 @@ bitbuf *
 bitbuf::
 pubsetbuf(unsigned char *buffer)
 {
-    assert(buffer != NULL);
+    BOOST_ASSERT(buffer != NULL);
 
     return pubsetbuf(buffer, npos);
 }
@@ -116,9 +146,9 @@ bitbuf *
 bitbuf::
 pubsetbuf(unsigned char *buffer, std::streamsize size, std::streampos position)
 {
-    assert(buffer != NULL);
-    assert(size >= 0);
-    assert(position >= 0);
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT(position >= 0);
 
     return setbuf(buffer, size, position);
 }
@@ -155,7 +185,7 @@ std::streamsize
 bitbuf::
 sgetn(bitfield &value, std::streamsize size)
 {
-    assert(size >= 0);
+    BOOST_ASSERT(size >= 0);
 
     return xsgetn(value, size);
 }
@@ -221,12 +251,12 @@ void
 bitbuf::
 setg(unsigned char *buffer, std::streampos gbeg, std::streampos gnext, std::streampos gend)
 {
-    assert(buffer != NULL);
-    assert(gbeg >= 0);
-    assert(gnext >= 0);
-    assert(gend >= 0);
-    assert(gbeg <= gnext);
-    assert(gnext <= gend);
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(gbeg >= 0);
+    BOOST_ASSERT(gnext >= 0);
+    BOOST_ASSERT(gend >= 0);
+    BOOST_ASSERT(gbeg <= gnext);
+    BOOST_ASSERT(gnext <= gend);
 
     m_buffer = buffer;
     m_eback = gbeg;
@@ -245,7 +275,7 @@ std::streampos
 bitbuf::
 seekpos(std::streampos position)
 {
-    assert(position >= 0);
+    BOOST_ASSERT(position >= 0);
 
     return AssureValidGetPointer(position);
 }
@@ -271,7 +301,7 @@ seekoff(std::streamoff offset, std::ios_base::seekdir way)
         break;
 
     default:
-        assert(false);
+        BOOST_ASSERT(false);
         newPosition = npos;
         break;
 
@@ -284,7 +314,7 @@ std::streampos
 bitbuf::
 AssureValidGetPointer(std::streampos position)
 {
-    assert(position >= 0);
+    BOOST_ASSERT(position >= 0);
 
     decltype(AssureValidGetPointer(0)) newPosition;
 
@@ -297,7 +327,7 @@ AssureValidGetPointer(std::streampos position)
         m_gptr = newPosition = position;
     }
 
-    assert(newPosition == npos ||
+    BOOST_ASSERT(newPosition == npos ||
         (newPosition >= eback() && newPosition <= egptr()));
 
     return newPosition;
@@ -307,9 +337,9 @@ bitbuf *
 bitbuf::
 setbuf(unsigned char *buffer, std::streamsize size, std::streampos position)
 {
-    assert(buffer != NULL);
-    assert(size >= 0);
-    assert(position >= 0);
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT(position >= 0);
 
     setg(buffer, position, position, size);
 
@@ -327,7 +357,7 @@ std::streamsize
 bitbuf::
 xsgetn(bitfield &value, std::streamsize size)
 {
-    assert(size >= 0);
+    BOOST_ASSERT(size >= 0);
 
     decltype(size) bitsGotten = 0;
 
@@ -353,7 +383,7 @@ xsgetn(bitfield &value, std::streamsize size)
             oldShiftAmount += CHAR_BIT;
         }
 
-        assert(shiftAmount == oldShiftAmount);
+        BOOST_ASSERT(shiftAmount == oldShiftAmount);
 
         mask <<= shiftAmount;
 
@@ -394,18 +424,29 @@ currentByte() const
 /// this class return a value of streamsize or std::streampos type.
 const std::streampos bitbuf::npos = static_cast<std::streampos>(-1);
 
-#pragma endregion
-#pragma region ibitstream
-////////////////////////////////////////////////////////////////////////////////
+// ibitstream //////////////////////////////////////////////////////////////////
 
 ibitstream::
 ibitstream(std::ios_base::openmode which) :
     m_bitbuf(which), m_state(0), m_gcount(0), m_gvalue(0), m_repeat(0)
 {
-    assert((which & std::ios_base::app) == 0); // Append to input? Huh?
-    assert((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-    assert((which & std::ios_base::out) == 0); // Output not currently supported.
-    assert((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+}
+
+ibitstream::
+ibitstream(char *buffer, std::streamsize size, std::ios_base::openmode which) :
+    m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
+    m_repeat(0)
+{
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
 }
 
 ibitstream::
@@ -413,12 +454,12 @@ ibitstream(signed char *buffer, std::streamsize size, std::ios_base::openmode wh
     m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
     m_repeat(0)
 {
-    assert(buffer != NULL);
-    assert(size >= 0);
-    assert((which & std::ios_base::app) == 0); // Append to input? Huh?
-    assert((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-    assert((which & std::ios_base::out) == 0); // Output not currently supported.
-    assert((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
 }
 
 ibitstream::
@@ -426,12 +467,25 @@ ibitstream(unsigned char *buffer, std::streamsize size, std::ios_base::openmode 
     m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
     m_repeat(0)
 {
-    assert(buffer != NULL);
-    assert(size >= 0);
-    assert((which & std::ios_base::app) == 0); // Append to input? Huh?
-    assert((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-    assert((which & std::ios_base::out) == 0); // Output not currently supported.
-    assert((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+}
+
+ibitstream::
+ibitstream(const char *buffer, std::streamsize size, std::ios_base::openmode which) :
+    m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
+    m_repeat(0)
+{
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
 }
 
 ibitstream::
@@ -439,12 +493,12 @@ ibitstream(const signed char *buffer, std::streamsize size, std::ios_base::openm
     m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
     m_repeat(0)
 {
-    assert(buffer != NULL);
-    assert(size >= 0);
-    assert((which & std::ios_base::app) == 0); // Append to input? Huh?
-    assert((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-    assert((which & std::ios_base::out) == 0); // Output not currently supported.
-    assert((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
 }
 
 ibitstream::
@@ -452,12 +506,12 @@ ibitstream(const unsigned char *buffer, std::streamsize size, std::ios_base::ope
     m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
     m_repeat(0)
 {
-    assert(buffer != NULL);
-    assert(size >= 0);
-    assert((which & std::ios_base::app) == 0); // Append to input? Huh?
-    assert((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-    assert((which & std::ios_base::out) == 0); // Output not currently supported.
-    assert((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+    BOOST_ASSERT(buffer != NULL);
+    BOOST_ASSERT(size >= 0);
+    BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
+    BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
+    BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
+    BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
 }
 
 ibitstream::
@@ -488,7 +542,7 @@ ibitstream &
 ibitstream::
 ignore(std::streamsize bits)
 {
-    assert(bits >= 0);
+    BOOST_ASSERT(bits >= 0);
 
     if (m_bitbuf.pubseekoff(bits, std::ios_base::cur) == bitbuf::npos)
     {
@@ -507,7 +561,7 @@ ibitstream &
 ibitstream::
 aligng(size_t bit)
 {
-    assert(bit > 0);
+    BOOST_ASSERT(bit > 0);
     if (good() && bit > 0)
     {
         seekg(((static_cast<size_t>(tellg()) + bit - 1) / bit) * bit);
@@ -539,7 +593,7 @@ ibitstream &
 ibitstream::
 read(bitfield &value, std::streamsize bits)
 {
-    assert(bits >= 0);
+    BOOST_ASSERT(bits >= 0);
 
     decltype(bits) bitsRead = m_bitbuf.sgetn(value, bits);
     if (bitsRead != bits)
@@ -563,7 +617,7 @@ ibitstream &
 ibitstream::
 readsome(bitfield &value, std::streamsize bits)
 {
-    assert(bits >= 0);
+    BOOST_ASSERT(bits >= 0);
 
     return read(value, bits);
 }
@@ -572,7 +626,7 @@ ibitstream &
 ibitstream::
 seekg(std::streampos position)
 {
-    assert(position >= 0);
+    BOOST_ASSERT(position >= 0);
 
     if (m_bitbuf.pubseekpos(position) == bitbuf::npos)
     {
@@ -730,9 +784,7 @@ alignedg(size_t bit)
     return tellg() % bit == 0;
 }
 
-#pragma endregion
-#pragma region Manipulators
-////////////////////////////////////////////////////////////////////////////////
+// Manipulators ////////////////////////////////////////////////////////////////
 
 //@{
 setrepeat::
@@ -779,7 +831,7 @@ ibitstream &operator>>(ibitstream &ibs, ignore skip)
 aligng::
 aligng(size_t bits) : m_bits(bits)
 {
-    assert(bits > 0);
+    BOOST_ASSERT(bits > 0);
 }
 
 ibitstream &
@@ -795,9 +847,7 @@ ibitstream &operator>>(ibitstream &ibs, aligng align)
 }
 //@}
 
-#pragma endregion
-#pragma region Operator overloads
-////////////////////////////////////////////////////////////////////////////////
+// Operator overloads //////////////////////////////////////////////////////////
 
 ibitstream &operator>>(ibitstream &ibs, bool &b)
 {
@@ -822,5 +872,6 @@ ibitstream &operator>>(ibitstream &ibs, const bool &b)
     return ibs;
 }
 
-#pragma endregion
+} // namespace bstream
 
+} // namespace boost

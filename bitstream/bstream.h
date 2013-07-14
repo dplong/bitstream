@@ -1,3 +1,11 @@
+// Copyright (C) 2013 Paul Long.
+//
+// Use, modification, and distribution is subject to the Boost Software
+// License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//
+// See http://www.boost.org/libs/bstream for documentation.
+
 ///
 /// This file contains classes for manipulating bits as input streams.
 ///
@@ -44,36 +52,35 @@
 /// }
 /// @endcode
 
-#pragma once
+#ifndef BOOST_BSTREAM_HPP
+#define BOOST_BSTREAM_HPP
 
-#pragma region Includes
-////////////////////////////////////////////////////////////////////////////////
+// Includes ////////////////////////////////////////////////////////////////////
 
 #include <bitset>
 #include <vector>
 #include <cassert>
 #include "boost/typeof/typeof.hpp"
+#include "boost/assert.hpp"
 
 // This code uses decltype, which is defined in terms of BOOST's type_of. BOOST
 // only knows about C++'s core types, so we have to tell it about streampos.
 #include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
 BOOST_TYPEOF_REGISTER_TYPE(std::streampos)
 
-#pragma endregion
-#pragma region Constants
-////////////////////////////////////////////////////////////////////////////////
+namespace boost {
 
-#pragma endregion
-#pragma region Typedefs
-////////////////////////////////////////////////////////////////////////////////
+namespace bstream {
+
+// Constants ///////////////////////////////////////////////////////////////////
+
+// Typedefs ////////////////////////////////////////////////////////////////////
 
 ///
 /// Integral type for bit-field values.
 typedef decltype(std::bitset<0>().to_ulong()) bitfield;
 
-#pragma endregion
-#pragma region bitbuf
-////////////////////////////////////////////////////////////////////////////////
+// bitbuf //////////////////////////////////////////////////////////////////////
 
 ///
 /// This class represents contiguous memory, accessed as a sequence of bit fields.
@@ -99,6 +106,15 @@ public:
     /// @param[in] buffer Pointer to char array to be accessed.
     /// @param[in] which Open mode.
     /// @param[in] size Number of accessible bits in char array.
+    bitbuf(char *buffer, std::streamsize size = INT_MAX,
+        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
+
+    ///
+    /// Constructor.
+    ///
+    /// @param[in] buffer Pointer to char array to be accessed.
+    /// @param[in] which Open mode.
+    /// @param[in] size Number of accessible bits in char array.
     bitbuf(signed char *buffer, std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
 
@@ -109,6 +125,15 @@ public:
     /// @param[in] which Open mode.
     /// @param[in] size Number of accessible bits in char array.
     bitbuf(unsigned char *buffer, std::streamsize size = INT_MAX,
+        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
+
+    ///
+    /// Constructor.
+    ///
+    /// @param[in] buffer Pointer to char array to be accessed.
+    /// @param[in] which Open mode.
+    /// @param[in] size Number of accessible bits in char array.
+    bitbuf(const char *buffer, std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
 
     ///
@@ -351,9 +376,7 @@ private:
     unsigned char *m_buffer;
 };
 
-#pragma endregion
-#pragma region ibitstream
-////////////////////////////////////////////////////////////////////////////////
+// ibitstream //////////////////////////////////////////////////////////////////
 
 ///
 /// This class provides an interface to manipulate bits as an input stream.
@@ -381,6 +404,15 @@ public:
     /// @param[in] buffer Pointer to char array to be accessed.
     /// @param[in] size Number of accessible bits in char array.
     /// @param[in] which Open mode.
+    explicit ibitstream(char *buffer, std::streamsize size = INT_MAX,
+        std::ios_base::openmode which = std::ios_base::in);
+
+    ///
+    /// Constructor.
+    ///
+    /// @param[in] buffer Pointer to char array to be accessed.
+    /// @param[in] size Number of accessible bits in char array.
+    /// @param[in] which Open mode.
     explicit ibitstream(signed char *buffer, std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in);
 
@@ -391,6 +423,15 @@ public:
     /// @param[in] size Number of accessible bits in char array.
     /// @param[in] which Open mode.
     explicit ibitstream(unsigned char *buffer, std::streamsize size = INT_MAX,
+        std::ios_base::openmode which = std::ios_base::in);
+
+    ///
+    /// Constructor.
+    ///
+    /// @param[in] buffer Pointer to char array to be accessed.
+    /// @param[in] size Number of accessible bits in char array.
+    /// @param[in] which Open mode.
+    explicit ibitstream(const char *buffer, std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in);
 
     ///
@@ -654,9 +695,7 @@ private:
     size_t m_repeat;
 };
 
-#pragma endregion
-#pragma region Manipulators
-////////////////////////////////////////////////////////////////////////////////
+// Manipulators ////////////////////////////////////////////////////////////////
 
 //@{
 ///
@@ -798,9 +837,7 @@ private:
 ibitstream &operator>>(ibitstream &ibs, aligng align);
 //@}
 
-#pragma endregion
-#pragma region Operator overloads
-////////////////////////////////////////////////////////////////////////////////
+// Operator overloads //////////////////////////////////////////////////////////
 
 ///
 /// Get single bit from input stream and place in bool.
@@ -818,9 +855,7 @@ ibitstream &operator>>(ibitstream &ibs, bool &b);
 /// @return Reference to ibitstream parameter.
 ibitstream &operator>>(ibitstream &ibs, const bool &b);
 
-#pragma endregion
-#pragma region Templates
-////////////////////////////////////////////////////////////////////////////////
+// Templates ///////////////////////////////////////////////////////////////////
 
 ///
 /// Get bit field from input stream and place in integral.
@@ -911,7 +946,7 @@ ibitstream &operator>>(ibitstream &ibs, std::bitset<N> &bs)
     decltype(bs.to_ulong()) value;
     ibs.read(value, N);
     bs = static_cast<long>(value);
-    assert(bs.to_ulong() == value);
+    BOOST_ASSERT(bs.to_ulong() == value);
 
     return ibs;
 }
@@ -935,5 +970,8 @@ ibitstream &operator>>(ibitstream &ibs, const std::bitset<N> &bs)
     return ibs;
 }
 
-#pragma endregion
+} // namespace bstream
 
+} // namespace boost
+
+#endif
