@@ -6,7 +6,6 @@
 //
 // See http://www.boost.org/libs/bstream for documentation.
 
-#include "bstream.h"
 #include <iostream>
 using namespace std;
 extern bool rtpTest();

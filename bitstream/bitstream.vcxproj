@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bstream.h" />
+    <ClInclude Include="bstream.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bstream.cpp" />
