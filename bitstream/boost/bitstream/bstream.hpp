@@ -59,7 +59,7 @@
 #ifndef BOOST_BITSTREAM_BSTREAM_HPP
 #define BOOST_BITSTREAM_BSTREAM_HPP
 
-// Includes ////////////////////////////////////////////////////////////////////
+// Includes ///////////////////////////////////////////////////////////////////
 
 #include <bitset>
 #include <vector>
@@ -77,18 +77,19 @@ namespace boost {
 
 namespace bitstream {
 
-// Constants ///////////////////////////////////////////////////////////////////
+// Constants //////////////////////////////////////////////////////////////////
 
-// Typedefs ////////////////////////////////////////////////////////////////////
+// Typedefs ///////////////////////////////////////////////////////////////////
 
 ///
 /// Integral type for bit-field values.
 typedef decltype(std::bitset<0>().to_ulong()) bitfield;
 
-// bitbuf //////////////////////////////////////////////////////////////////////
+// bitbuf /////////////////////////////////////////////////////////////////////
 
 ///
-/// This class represents contiguous memory, accessed as a sequence of bit fields.
+/// This class represents contiguous memory, accessed as a sequence of bit
+/// fields.
 ///
 /// @note This class is based on but does not inherit from the standard class,
 /// stringbuf. The main difference is that this class provides access to bits
@@ -103,13 +104,18 @@ public:
     /// Constructor.
     ///
     /// @param[in] which Open mode.
-    explicit bitbuf(std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) :
+    explicit bitbuf(std::ios_base::openmode which =
+        std::ios_base::in | std::ios_base::out) :
         m_buffer(NULL), m_gptr(0), m_egptr(INT_MAX), m_eback(0)
     {
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Output not support, so can't append.
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Output not support, so can't append each time.
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -119,15 +125,21 @@ public:
     /// @param[in] which Open mode.
     /// @param[in] size Number of accessible bits in char array.
     bitbuf(char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) :
-        m_buffer(reinterpret_cast<unsigned char *>(buffer)), m_gptr(0), m_egptr(size), m_eback(0)
+        std::ios_base::openmode which =
+        std::ios_base::in | std::ios_base::out) :
+        m_buffer(reinterpret_cast<unsigned char *>(buffer)), m_gptr(0),
+        m_egptr(size), m_eback(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Output not support, so can't append.
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Output not support, so can't append each time.
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -137,15 +149,21 @@ public:
     /// @param[in] which Open mode.
     /// @param[in] size Number of accessible bits in char array.
     bitbuf(signed char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) :
-        m_buffer(reinterpret_cast<unsigned char *>(buffer)), m_gptr(0), m_egptr(size), m_eback(0)
+        std::ios_base::openmode which =
+        std::ios_base::in | std::ios_base::out) :
+        m_buffer(reinterpret_cast<unsigned char *>(buffer)), m_gptr(0),
+        m_egptr(size), m_eback(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Output not support, so can't append.
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Output not support, so can't append each time.
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -155,15 +173,20 @@ public:
     /// @param[in] which Open mode.
     /// @param[in] size Number of accessible bits in char array.
     bitbuf(unsigned char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) :
+        std::ios_base::openmode which =
+        std::ios_base::in | std::ios_base::out) :
         m_buffer(buffer), m_gptr(0), m_egptr(size), m_eback(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Output not support, so can't append.
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Output not support, so can't append each time.
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -173,16 +196,21 @@ public:
     /// @param[in] which Open mode.
     /// @param[in] size Number of accessible bits in char array.
     bitbuf(const char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) :
-        m_buffer(reinterpret_cast<unsigned char *>(const_cast<char *>(buffer))),
-        m_gptr(0), m_egptr(size), m_eback(0)
+        std::ios_base::openmode which =
+        std::ios_base::in | std::ios_base::out) :
+        m_buffer(reinterpret_cast<unsigned char *>(const_cast<char *>(
+        buffer))), m_gptr(0), m_egptr(size), m_eback(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Output not support, so can't append.
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Output not support, so can't append each time.
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -192,16 +220,21 @@ public:
     /// @param[in] which Open mode.
     /// @param[in] size Number of accessible bits in char array.
     bitbuf(const signed char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) :
-        m_buffer(reinterpret_cast<unsigned char *>(const_cast<signed char *>(buffer))),
-        m_gptr(0), m_egptr(size), m_eback(0)
+        std::ios_base::openmode which =
+        std::ios_base::in | std::ios_base::out) :
+        m_buffer(reinterpret_cast<unsigned char *>(const_cast<signed char *>(
+        buffer))), m_gptr(0), m_egptr(size), m_eback(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Output not support, so can't append.
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Output not support, so can't append each time.
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -211,15 +244,21 @@ public:
     /// @param[in] which Open mode.
     /// @param[in] size Number of accessible bits in char array.
     bitbuf(const unsigned char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) :
-        m_buffer(const_cast<unsigned char *>(buffer)), m_gptr(0), m_egptr(size), m_eback(0)
+        std::ios_base::openmode which =
+        std::ios_base::in | std::ios_base::out) :
+        m_buffer(const_cast<unsigned char *>(buffer)), m_gptr(0),
+        m_egptr(size), m_eback(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Output not support, so can't append.
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Output not support, so can't append each time.
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -242,9 +281,10 @@ public:
     /// Reposition get-next-bit pointer relative to current position.
     ///
     /// @param[in] offset Signed offset from current position for new position.
-    /// @param[in] way From which pointer the offset is applied for the new position.
+    /// @param[in] way From which pointer offset is applied for new position.
     /// @return Position after offset applied.
-    std::streampos pubseekoff(std::streamoff offset, std::ios_base::seekdir way)
+    std::streampos pubseekoff(std::streamoff offset,
+        std::ios_base::seekdir way)
     {
         return seekoff(offset, way);
     }
@@ -348,7 +388,8 @@ public:
     {
         bool okay;
 
-        if (pubseekoff(1, std::ios_base::cur) == static_cast<std::streampos>(bitbuf::npos))
+        if (pubseekoff(1, std::ios_base::cur) ==
+            static_cast<std::streampos>(bitbuf::npos))
         {
             okay = false;
         }
@@ -369,7 +410,8 @@ public:
     {
         bool okay;
 
-        if (pubseekoff(-1, std::ios_base::cur) == static_cast<std::streampos>(bitbuf::npos))
+        if (pubseekoff(-1, std::ios_base::cur) ==
+            static_cast<std::streampos>(bitbuf::npos))
         {
             okay = false;
         }
@@ -382,7 +424,8 @@ public:
     }
 
     ///
-    /// Represents both an unbounded number of bits and an attempt to move past bit-stream bounds.
+    /// Represents both an unbounded number of bits and an attempt to move past
+    /// bit-stream bounds.
     ///
     /// @note A consumer might encounter this value where member functions of
     /// this class return a value of streamsize or streampos type.
@@ -400,7 +443,8 @@ public:
 
 protected:
     ///
-    /// Returns bit position within accessible input sequence of next bit to be read.
+    /// Returns bit position within accessible input sequence of next bit to be
+    /// read.
     ///
     /// @note The "get pointer."
     ///
@@ -429,13 +473,16 @@ protected:
     }
 
     ///
-    /// Set pointer and offsets that define boundaries of and position within accessible input sequence.
+    /// Set pointer and offsets that define boundaries of and position within
+    /// accessible input sequence.
     ///
     /// @param[in] buffer Pointer to char array to be accessed.
     /// @param[in] gbeg Position of first accessible bit in char array.
     /// @param[in] gnext Position of next bit to read.
-    /// @param[in] gend Position of bit immediately after last accessible bit in char array.
-    void setg(unsigned char *buffer, std::streampos gbeg, std::streampos gnext, std::streampos gend)
+    /// @param[in] gend Position of bit immediately after last accessible bit
+    /// in char array.
+    void setg(unsigned char *buffer, std::streampos gbeg, std::streampos gnext,
+        std::streampos gend)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(gbeg >= 0);
@@ -468,41 +515,42 @@ protected:
     {
         BOOST_ASSERT(position >= 0);
 
-        return AssureValidGetPointer(position);
+        return assure_valid_get_pointer(position);
     }
 
     ///
     /// Set get pointer relative to current position.
     ///
     /// @param[in] offset Amount by which get pointer is adjusted.
-    /// @param[in] way From which pointer the offset is applied for the new position.
+    /// @param[in] way From which pointer offset is applied for new position.
     /// @return New position after get pointer modified.
-    virtual std::streampos seekoff(std::streamoff offset, std::ios_base::seekdir way)
+    virtual std::streampos seekoff(std::streamoff offset,
+        std::ios_base::seekdir way)
     {
-        decltype(seekoff(0,std::ios_base::cur)) newPosition;
+        decltype(seekoff(0,std::ios_base::cur)) new_position;
 
         switch (way)
         {
         case std::ios_base::beg:
-            newPosition = AssureValidGetPointer(eback() + offset);
+            new_position = assure_valid_get_pointer(eback() + offset);
             break;
 
         case std::ios_base::cur:
-            newPosition = AssureValidGetPointer(gptr() + offset);
+            new_position = assure_valid_get_pointer(gptr() + offset);
             break;
 
         case std::ios_base::end:
-            newPosition = AssureValidGetPointer(egptr() + offset);
+            new_position = assure_valid_get_pointer(egptr() + offset);
             break;
 
         default:
             BOOST_ASSERT(false);
-            newPosition = npos;
+            new_position = npos;
             break;
 
         }
 
-        return newPosition;
+        return new_position;
     }
 
     ///
@@ -511,26 +559,26 @@ protected:
     /// If bit position is within bounds, use as internal get pointer and
     /// return it; otherwise, return npos.
     ///
-    /// @param[in] position Candidate for new current bit position, or get pointer.
-    std::streampos AssureValidGetPointer(std::streampos position)
+    /// @param[in] position Candidate for new current position, or get pointer.
+    std::streampos assure_valid_get_pointer(std::streampos position)
     {
         BOOST_ASSERT(position >= 0);
 
-        decltype(AssureValidGetPointer(0)) newPosition;
+        decltype(assure_valid_get_pointer(0)) new_position;
 
         if (position < eback() || position > egptr())
         {
-            newPosition = npos;
+            new_position = npos;
         }
         else
         {
-            m_gptr = newPosition = position;
+            m_gptr = new_position = position;
         }
 
-        BOOST_ASSERT(newPosition == static_cast<std::streampos>(npos) ||
-            (newPosition >= eback() && newPosition <= egptr()));
+        BOOST_ASSERT(new_position == static_cast<std::streampos>(npos) ||
+            (new_position >= eback() && new_position <= egptr()));
 
-        return newPosition;
+        return new_position;
     }
 
     ///
@@ -540,7 +588,8 @@ protected:
     /// @param[in] size Number of accessible bits in char array.
     /// @param[in] position Offset of first accessible bit in char array.
     /// @return Pointer to this object; NULL if error.
-    virtual bitbuf *setbuf(unsigned char *buffer, std::streamsize size, std::streampos position)
+    virtual bitbuf *setbuf(unsigned char *buffer, std::streamsize size,
+        std::streampos position)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
@@ -574,7 +623,7 @@ protected:
     {
         BOOST_ASSERT(size >= 0);
 
-        decltype(size) bitsGotten = 0;
+        decltype(size) bits_gotten = 0;
 
         if (size > 0 && size <= egptr() - gptr())
         {
@@ -589,48 +638,52 @@ protected:
 
             // Shift over so mask appears at correct location within integral,
             // e.g., 0000000111111000.
-            size_t intraByteBitOffset = m_gptr % CHAR_BIT; // Offset in current byte.
-            size_t shiftAmount = (CHAR_BIT - ((size + intraByteBitOffset) % CHAR_BIT)) % CHAR_BIT;
+            // Offset in current byte.
+            size_t intra_byte_bit_offset = m_gptr % CHAR_BIT;
+            size_t shift_amount = (CHAR_BIT -
+                ((size + intra_byte_bit_offset) % CHAR_BIT)) % CHAR_BIT;
 
-            size_t oldShiftAmount = (static_cast<unsigned>(CHAR_BIT) * 2 -
-                intraByteBitOffset - size) % CHAR_BIT;
-            if (oldShiftAmount > CHAR_BIT) {
-                oldShiftAmount += CHAR_BIT;
+            size_t old_shift_amount = (static_cast<unsigned>(CHAR_BIT) * 2 -
+                intra_byte_bit_offset - size) % CHAR_BIT;
+            if (old_shift_amount > CHAR_BIT) {
+                old_shift_amount += CHAR_BIT;
             }
 
-            BOOST_ASSERT(shiftAmount == oldShiftAmount);
+            BOOST_ASSERT(shift_amount == old_shift_amount);
 
-            mask <<= shiftAmount;
+            mask <<= shift_amount;
 
             // Accumulate current value of each byte involved in bit field.
-            size_t byteCount = (static_cast<size_t>(size) + shiftAmount + CHAR_BIT - 1) / CHAR_BIT;
-            std::remove_reference<decltype(value)>::type preMaskValue = 0;
-            for (decltype(byteCount) i = 0; i < byteCount; ++i)
+            size_t byte_count = (static_cast<size_t>(size) + shift_amount +
+                CHAR_BIT - 1) / CHAR_BIT;
+            std::remove_reference<decltype(value)>::type pre_mask_value = 0;
+            for (decltype(byte_count) i = 0; i < byte_count; ++i)
             {
-                preMaskValue <<= static_cast<unsigned>(CHAR_BIT);
-                preMaskValue |= currentByte()[i];
+                pre_mask_value <<= static_cast<unsigned>(CHAR_BIT);
+                pre_mask_value |= current_byte()[i];
             }
 
             // Apply mask and right justify. (Consumer wants the normalized
             // value, not the value as it occurs in the buffer.)
-            value = preMaskValue & mask;
-            value >>= shiftAmount;
+            value = pre_mask_value & mask;
+            value >>= shift_amount;
 
             // Advance bit pointer past field in preparation for next access.
             gbump(size);
 
-            bitsGotten = size;
+            bits_gotten = size;
         }
 
-        return bitsGotten;
+        return bits_gotten;
     }
 
 private:
     ///
     /// Get pointer to current byte.
     ///
-    /// @return Pointer to byte containing current bit position (the next bit to read).
-    unsigned char *currentByte() const
+    /// @return Pointer to byte containing current bit position (the next bit
+    /// to read).
+    unsigned char *current_byte() const
     {
         return &m_buffer[m_gptr / CHAR_BIT];
     }
@@ -662,7 +715,7 @@ private:
     unsigned char *m_buffer;
 };
 
-// ibitstream //////////////////////////////////////////////////////////////////
+// ibitstream /////////////////////////////////////////////////////////////////
 
 ///
 /// This class provides an interface to manipulate bits as an input stream.
@@ -685,10 +738,14 @@ public:
     explicit ibitstream(std::ios_base::openmode which = std::ios_base::in) :
         m_bitbuf(which), m_state(0), m_gcount(0), m_gvalue(0), m_repeat(0)
     {
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Append to input? Huh?
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Input at end of stream? Huh?
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -704,10 +761,14 @@ public:
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Append to input? Huh?
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Input at end of stream? Huh?
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -723,10 +784,14 @@ public:
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Append to input? Huh?
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Input at end of stream? Huh?
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -742,10 +807,14 @@ public:
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Append to input? Huh?
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Input at end of stream? Huh?
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -761,10 +830,14 @@ public:
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Append to input? Huh?
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Input at end of stream? Huh?
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -773,17 +846,22 @@ public:
     /// @param[in] buffer Pointer to char array to be accessed.
     /// @param[in] size Number of accessible bits in char array.
     /// @param[in] which Open mode.
-    explicit ibitstream(const signed char *buffer, std::streamsize size = INT_MAX,
+    explicit ibitstream(const signed char *buffer,
+        std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in) :
         m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
         m_repeat(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Append to input? Huh?
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Input at end of stream? Huh?
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -792,17 +870,22 @@ public:
     /// @param[in] buffer Pointer to char array to be accessed.
     /// @param[in] size Number of accessible bits in char array.
     /// @param[in] which Open mode.
-    explicit ibitstream(const unsigned char *buffer, std::streamsize size = INT_MAX,
+    explicit ibitstream(const unsigned char *buffer,
+        std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in) :
         m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
         m_repeat(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
-        BOOST_ASSERT((which & std::ios_base::app) == 0); // Append to input? Huh?
-        BOOST_ASSERT((which & std::ios_base::ate) == 0); // Input at end of stream? Huh?
-        BOOST_ASSERT((which & std::ios_base::out) == 0); // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0); // Truncate not currently supported.
+        // Append to input? Huh?
+        BOOST_ASSERT((which & std::ios_base::app) == 0);
+        // Input at end of stream? Huh?
+        BOOST_ASSERT((which & std::ios_base::ate) == 0);
+        // Output not currently supported.
+        BOOST_ASSERT((which & std::ios_base::out) == 0);
+        // Truncate not currently supported.
+        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     ///
@@ -841,7 +924,8 @@ public:
     {
         BOOST_ASSERT(bits >= 0);
 
-        if (m_bitbuf.pubseekoff(bits, std::ios_base::cur) == static_cast<std::streampos>(bitbuf::npos))
+        if (m_bitbuf.pubseekoff(bits, std::ios_base::cur) ==
+            static_cast<std::streampos>(bitbuf::npos))
         {
             eofbit();
             m_gcount = 0;
@@ -905,8 +989,8 @@ public:
     {
         BOOST_ASSERT(bits >= 0);
 
-        decltype(bits) bitsRead = m_bitbuf.sgetn(value, bits);
-        if (bitsRead != bits)
+        decltype(bits) bits_read = m_bitbuf.sgetn(value, bits);
+        if (bits_read != bits)
         {
             failbit();
             eofbit();
@@ -915,7 +999,7 @@ public:
         }
         else
         {
-            m_gcount = bitsRead;
+            m_gcount = bits_read;
         }
 
         m_gvalue = value;
@@ -949,7 +1033,8 @@ public:
     {
         BOOST_ASSERT(position >= 0);
 
-        if (m_bitbuf.pubseekpos(position) == static_cast<std::streampos>(bitbuf::npos))
+        if (m_bitbuf.pubseekpos(position) ==
+            static_cast<std::streampos>(bitbuf::npos))
         {
             failbit();
         }
@@ -965,7 +1050,8 @@ public:
     /// @return This bit stream.
     ibitstream &seekg(std::streamoff offset, std::ios_base::seek_dir dir)
     {
-        if (m_bitbuf.pubseekoff(offset, dir) == static_cast<std::streampos>(bitbuf::npos))
+        if (m_bitbuf.pubseekoff(offset, dir) ==
+            static_cast<std::streampos>(bitbuf::npos))
         {
             failbit();
         }
@@ -999,7 +1085,8 @@ public:
     {
         m_gcount = 0;
 
-        if (static_cast<decltype(bitbuf::eof)>(m_bitbuf.pubseekoff(-1, std::ios_base::cur)) == bitbuf::eof)
+        if (static_cast<decltype(bitbuf::eof)>(
+            m_bitbuf.pubseekoff(-1, std::ios_base::cur)) == bitbuf::eof)
         {
             failbit();
         }
@@ -1137,7 +1224,8 @@ public:
     /// merely saves a value that any subsequent vector extractions use to know
     /// how many bit fields to extract into the same number of vector elements.
     ///
-    /// @param repeat Number of bit fields to extract to each subsequent vector.
+    /// @param repeat Number of bit fields to extract to each subsequent
+    /// vector.
     /// @return This bit stream.
     ibitstream &setrepeat(size_t repeat)
     {
@@ -1157,8 +1245,10 @@ private:
     ///
     /// Friend const functions for access to badbit().
     //@{
-    template <typename T> friend ibitstream &operator>>(ibitstream &ibs, const T &b);
-    template <size_t N> friend ibitstream &operator>>(ibitstream &ibs, const std::bitset<N> &bs);
+    template <typename T> friend ibitstream &operator>>(ibitstream &ibs,
+        const T &b);
+    template <size_t N> friend ibitstream &operator>>(ibitstream &ibs,
+        const std::bitset<N> &bs);
     friend ibitstream &operator>>(ibitstream &ibs, const bool &b);
     //@}
 
@@ -1225,7 +1315,7 @@ private:
     size_t m_repeat;
 };
 
-// Manipulators ////////////////////////////////////////////////////////////////
+// Manipulators ///////////////////////////////////////////////////////////////
 
 //@{
 ///
@@ -1239,7 +1329,8 @@ public:
     ///
     /// Constructor.
     ///
-    /// @param[in] repeat Number of bit fields to extract to each subsequent integral container.
+    /// @param[in] repeat Number of bit fields to extract to each subsequent
+    /// integral container.
     setrepeat(size_t repeat) : m_repeat(repeat)
     {
         // Do nothing.
@@ -1248,7 +1339,7 @@ public:
     ///
     /// Overload for the () operator on this class.
     ///
-    /// @param[in,out] ibs Reference to ibitstream on left-hand side of >> operator.
+    /// @param[in,out] ibs Reference to ibitstream on lhs of >> operator.
     /// @return Reference to ibitstream parameter.
     ibitstream &operator()(ibitstream &ibs) const
     {
@@ -1262,7 +1353,8 @@ private:
 };
 
 ///
-/// Manipulator for ibitstream that sets the repeat count for subsequent container extractions.
+/// Manipulator for ibitstream that sets repeat count for subsequent container
+/// extractions.
 ///
 /// @param[in,out] ibs Reference to ibitstream on left-hand side of operator.
 /// @param[in] repeat Instance of setrepeat class.
@@ -1293,7 +1385,7 @@ public:
     ///
     /// Overload for the () operator on this class.
     ///
-    /// @param[in,out] ibs Reference to ibitstream on left-hand side of >> operator.
+    /// @param[in,out] ibs Reference to ibitstream on lhs of >> operator.
     /// @return Reference to ibitstream parameter.
     ibitstream &operator()(ibitstream &ibs) const
     {
@@ -1369,7 +1461,7 @@ public:
     ///
     /// Overload for the () operator on this class.
     ///
-    /// @param[in,out] ibs Reference to ibitstream on left-hand side of >> operator.
+    /// @param[in,out] ibs Reference to ibitstream on lhs of >> operator.
     /// @return Reference to ibitstream parameter.
     ibitstream &operator()(ibitstream &ibs) const
     {
@@ -1394,7 +1486,7 @@ inline ibitstream &operator>>(ibitstream &ibs, aligng align)
 }
 //@}
 
-// Operator overloads //////////////////////////////////////////////////////////
+// Operator overloads /////////////////////////////////////////////////////////
 
 ///
 /// Get single bit from input stream and place in bool.
@@ -1431,7 +1523,7 @@ inline ibitstream &operator>>(ibitstream &ibs, const bool &b)
     return ibs;
 }
 
-// Templates ///////////////////////////////////////////////////////////////////
+// Templates //////////////////////////////////////////////////////////////////
 
 ///
 /// Get bit field from input stream and place in integral.
@@ -1472,8 +1564,8 @@ ibitstream &operator>>(ibitstream &ibs, const T &b)
 /// Get bit fields from input stream and place in integral vector.
 ///
 /// @note Starting with the first element, this function populates existing
-/// elements in the vector with bit fields sequentially extracted from the input
-/// stream. It does not increase the size of the vector, e.g., with
+/// elements in the vector with bit fields sequentially extracted from the
+/// input stream. It does not increase the size of the vector, e.g., with
 /// push_back(), because it relies on the existing size of the vector to know
 /// how many bit fields to extract.
 ///
@@ -1483,8 +1575,8 @@ ibitstream &operator>>(ibitstream &ibs, const T &b)
 template <typename T>
 ibitstream &operator>>(ibitstream &ibs, std::vector<T> &v)
 {
-    decltype(v.size()) vectorSize = v.size();
-    for (decltype(vectorSize) i = 0; i < vectorSize; ++i) {
+    decltype(v.size()) vector_size = v.size();
+    for (decltype(vector_size) i = 0; i < vector_size; ++i) {
         ibs >> v[i];
     }
 
@@ -1492,7 +1584,8 @@ ibitstream &operator>>(ibitstream &ibs, std::vector<T> &v)
 }
 
 ///
-/// Get bit fields from input stream that must be equal to elements in integral vector.
+/// Get bit fields from input stream that must be equal to elements in integral
+/// vector.
 ///
 /// @see Size note for non-const version of this function.
 ///

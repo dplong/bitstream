@@ -4,7 +4,7 @@
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// See http://www.boost.org/libs/bstream for documentation.
+// See http://www.boost.org/libs/bitstream for documentation.
 
 #include "boost/bstream.hpp"
 #include <cstdint>
@@ -43,8 +43,9 @@ bool rtpTest()
     }
     return bin &&
         !rtp.padding && !rtp.extension.present &&
-        csrcCount.to_ulong() == 0 && rtp.csrcIdentifier.empty() && !rtp.marker && rtp.payloadType.to_ulong() == 8 &&
-        rtp.sequenceNumber == 59196 && rtp.timestamp == 13421772 && rtp.ssrcIdentifier == 3435973836 &&
-        rtp.csrcIdentifier.empty();
+        csrcCount.to_ulong() == 0 && rtp.csrcIdentifier.empty() &&
+        !rtp.marker && rtp.payloadType.to_ulong() == 8 &&
+        rtp.sequenceNumber == 59196 && rtp.timestamp == 13421772 &&
+        rtp.ssrcIdentifier == 3435973836 && rtp.csrcIdentifier.empty();
 }
 
