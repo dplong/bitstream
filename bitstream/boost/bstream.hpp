@@ -10,8 +10,8 @@
 //
 // See http://www.boost.org/libs/bitstream for documentation.
 
-#ifndef BOOST_BITSTREAM_HPP
-#define BOOST_BITSTREAM_HPP
+#ifndef BOOST_BSTREAM_HPP
+#define BOOST_BSTREAM_HPP
 
 #include "boost/bitstream/bstream.hpp"
 
