@@ -10,52 +10,6 @@
 //
 // See http://www.boost.org/libs/bitstream for documentation.
 
-///
-/// This file contains classes for manipulating bits as input streams.
-///
-/// @note The ibitstream class is analogous to the C++ IOstream class,
-/// istringstream, except it manipulates bits, not characters.
-///
-/// Example:
-/// @code
-/// // Full parsing of an RTP header, including the often-overlooked
-/// // variable-length fields.
-/// 
-/// struct RtpHeader {
-///     bool padding, marker;
-///     bitset<7> payloadType;
-///     WORD sequenceNumber;
-///     DWORD timestamp, ssrcIdentifier;
-///     vector<DWORD> csrcIdentifier;
-///     struct {
-///         bool present;
-///         WORD identifier;
-///         vector<BYTE> contents;
-///     } extension;
-/// };
-/// 
-/// bool ParseRtpHeader(const BYTE *buffer, RtpHeader &rtp)
-/// {
-///     ibitstream bin(buffer);
-///     static const bitset<2> version(0x2);
-///     bitset<4> csrcCount;
-///     WORD extensionLength;
-/// 
-///     bin >> version >> rtp.padding >> rtp.extension.present
-///         >> csrcCount >> rtp.marker >> rtp.payloadType
-///         >> rtp.sequenceNumber >> rtp.timestamp >> rtp.ssrcIdentifier
-///         >> setrepeat(csrcCount.to_ulong()) >> rtp.csrcIdentifier;
-/// 
-///     if (rtp.extension.present) {
-///         bin >> rtp.extension.identifier >> extensionLength
-///             >> setrepeat(extensionLength * sizeof(DWORD))
-///             >> rtp.extension.contents;
-///     }
-/// 
-///     return bin.good();
-/// }
-/// @endcode
-
 #ifndef BOOST_BITSTREAM_BSTREAM_HPP
 #define BOOST_BITSTREAM_BSTREAM_HPP
 
@@ -736,7 +690,7 @@ public:
     ///
     /// @param[in] which Open mode.
     explicit ibitstream(std::ios_base::openmode which = std::ios_base::in) :
-        m_bitbuf(which), m_state(0), m_gcount(0), m_gvalue(0), m_repeat(0)
+        m_bitbuf(which), m_gvalue(0), m_repeat(0)
     {
         // Append to input? Huh?
         BOOST_ASSERT((which & std::ios_base::app) == 0);
@@ -756,8 +710,7 @@ public:
     /// @param[in] which Open mode.
     explicit ibitstream(char *buffer, std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in) :
-        m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
-        m_repeat(0)
+        m_bitbuf(buffer, size, which), m_gvalue(0), m_repeat(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
@@ -779,8 +732,7 @@ public:
     /// @param[in] which Open mode.
     explicit ibitstream(signed char *buffer, std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in) :
-        m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
-        m_repeat(0)
+        m_bitbuf(buffer, size, which), m_gvalue(0), m_repeat(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
@@ -802,8 +754,7 @@ public:
     /// @param[in] which Open mode.
     explicit ibitstream(unsigned char *buffer, std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in) :
-        m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
-        m_repeat(0)
+        m_bitbuf(buffer, size, which), m_gvalue(0), m_repeat(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
@@ -825,8 +776,7 @@ public:
     /// @param[in] which Open mode.
     explicit ibitstream(const char *buffer, std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in) :
-        m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
-        m_repeat(0)
+        m_bitbuf(buffer, size, which), m_gvalue(0), m_repeat(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
@@ -849,8 +799,7 @@ public:
     explicit ibitstream(const signed char *buffer,
         std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in) :
-        m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
-        m_repeat(0)
+        m_bitbuf(buffer, size, which), m_gvalue(0), m_repeat(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
@@ -873,8 +822,7 @@ public:
     explicit ibitstream(const unsigned char *buffer,
         std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in) :
-        m_bitbuf(buffer, size, which), m_state(0), m_gcount(0), m_gvalue(0),
-        m_repeat(0)
+        m_bitbuf(buffer, size, which), m_gvalue(0), m_repeat(0)
     {
         BOOST_ASSERT(buffer != NULL);
         BOOST_ASSERT(size >= 0);
@@ -1025,24 +973,6 @@ public:
     }
 
     ///
-    /// Set position of get pointer.
-    ///
-    /// @param[in] position Bit position.
-    /// @return This bit stream.
-    ibitstream &seekg(std::streampos position)
-    {
-        BOOST_ASSERT(position >= 0);
-
-        if (m_bitbuf.pubseekpos(position) ==
-            static_cast<std::streampos>(bitbuf::npos))
-        {
-            failbit();
-        }
-
-        return *this;
-    }
-
-    ///
     /// Set position of get pointer relative to indicated internal pointer.
     ///
     /// @param[in] offset Relative offset from indicated pointer.
@@ -1078,6 +1008,24 @@ public:
     }
 
     ///
+    /// Set position of get pointer.
+    ///
+    /// @param[in] position Bit position.
+    /// @return This bit stream.
+    ibitstream &seekg(std::streampos position)
+    {
+        BOOST_ASSERT(position >= 0);
+
+        if (m_bitbuf.pubseekpos(position) ==
+            static_cast<std::streampos>(bitbuf::npos))
+        {
+            failbit();
+        }
+
+        return *this;
+    }
+
+    ///
     /// Move get pointer backwards and return bit at new position.
     ///
     /// @return This bit stream.
@@ -1095,89 +1043,6 @@ public:
     }
 
     ///
-    /// Get error state flags.
-    ///
-    /// @return Error state flags.
-    std::ios_base::iostate rdstate() const
-    {
-        return m_state;
-    }
-
-    ///
-    /// Set error state flags.
-    ///
-    /// @param[in] state Error state flags.
-    void clear(std::ios_base::iostate state = std::ios_base::goodbit)
-    {
-        m_state = state;
-    }
-
-    ///
-    /// Set error state flags.
-    ///
-    /// @note This function sets states additively--no state is cleared.
-    ///
-    /// @param[in] state Error state flags.
-    void setstate(std::ios_base::iostate state)
-    {
-        m_state |= state;
-    }
-
-    ///
-    /// Check if error flag, badbit, is set.
-    ///
-    /// @note badbit is set if the integrity of the stream is lost, e.g.,
-    /// encountered unexpected value.
-    ///
-    /// @return Whether previous input operation set badbit.
-    bool bad() const
-    {
-        return (rdstate() & std::ios_base::badbit) != 0;
-    }
-
-    ///
-    /// Check if either error flag, failbit or badbit, is set.
-    ///
-    /// @note failbit is set when there is an error with the internal logic of
-    /// an operation.
-    ///
-    /// @see Note for bad().
-    ///
-    /// @return Whether previous input operation set failbit or badbit.
-    bool fail() const
-    {
-        return (rdstate() & std::ios_base::failbit) != 0 || eof();
-    }
-
-    ///
-    /// Check if error flag, eofbit, is set.
-    ///
-    /// @note eofbit is set when an operation attempts to access a bit position
-    /// outside of the bit stream, e.g., reading past end of bitstream.
-    ///
-    /// @return Whether previous input operation set eofbit.
-    bool eof() const
-    {
-        return (rdstate() & std::ios_base::eofbit) != 0;
-    }
-
-    ///
-    /// Check if bitstream is good for continued operation.
-    ///
-    /// @return Whether any of the error flags are set.
-    bool good() const
-    {
-        return rdstate() == 0;
-    }
-
-    ///
-    /// Get number of bits extracted by last input operation.
-    std::streamsize gcount() const
-    {
-        return m_gcount;
-    }
-
-    ///
     /// Get value extracted by last input operation.
     ///
     /// @note The value returned by this function is only valid if gcount()
@@ -1187,34 +1052,6 @@ public:
     bitfield gvalue() const
     {
         return m_gvalue;
-    }
-
-    ///
-    /// Evaluate stream object for failure.
-    ///
-    /// This function returns whether the internal failbit or badbit has been
-    /// set for this ibitstream.
-    ///
-    /// @note Same as calling fail(). bin.fail() is the same as !bin.
-    ///
-    /// @return Whether the failbit or badbit has been set.
-    bool operator!() const
-    {
-        return fail();
-    }
-
-    ///
-    /// Evaluate stream object for success.
-    ///
-    /// This function returns whether the internal failbit and badbit are not
-    /// set for this ibitstream.
-    ///
-    /// @note Same as calling !fail(). !bin.fail() is the same as bin.
-    ///
-    /// @return Whether the failbit and badbit are not set.
-    operator bool() const
-    {
-        return !fail();
     }
 
     ///
@@ -1236,13 +1073,6 @@ public:
 
 private:
     ///
-    /// Set badbit error flag.
-    void badbit()
-    {
-        m_state |= std::ios_base::badbit;
-    }
-
-    ///
     /// Friend const functions for access to badbit().
     //@{
     template <typename T> friend ibitstream &operator>>(ibitstream &ibs,
@@ -1251,20 +1081,6 @@ private:
         const std::bitset<N> &bs);
     friend ibitstream &operator>>(ibitstream &ibs, const bool &b);
     //@}
-
-    ///
-    /// Set failbit error flag.
-    void failbit()
-    {
-        m_state |= std::ios_base::failbit;
-    }
-
-    ///
-    /// Set eofbit error flag.
-    void eofbit()
-    {
-        m_state |= std::ios_base::eofbit;
-    }
 
     ///
     /// Determine whether get pointer is aligned to bit multiple.
@@ -1294,17 +1110,6 @@ private:
     ///
     /// Buffer from which this class serially extracts bits.
     bitbuf m_bitbuf;
-
-    ///
-    /// State of input stream.
-    ///
-    /// @note This member variable is a bit mask; therefore it represents
-    /// multiple states including eof and failure.
-    std::ios_base::iostate m_state;
-
-    ///
-    /// Number of bits extracted by last input operation.
-    std::streamsize m_gcount;
 
     ///
     /// Value extracted by last input operation.

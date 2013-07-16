@@ -21,6 +21,25 @@ namespace bitstream {
 
 class ibstream : public iob
 {
+public:
+    ///
+    /// Constructor.
+    explicit ibstream() : m_gcount(0)
+    {
+        // Do nothing.
+    }
+
+    ///
+    /// Get number of bits extracted by last input operation.
+    std::streamsize gcount() const
+    {
+        return m_gcount;
+    }
+
+protected:
+    ///
+    /// Number of bits extracted by last input operation.
+    std::streamsize m_gcount;
 };
 
 } // namespace bitstream
