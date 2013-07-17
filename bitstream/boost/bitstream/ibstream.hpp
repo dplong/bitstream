@@ -24,7 +24,7 @@ class ibstream : public iob
 public:
     ///
     /// Constructor.
-    explicit ibstream() : m_gcount(0)
+    explicit ibstream(bitbuf *bb) : iob(bb), m_gcount(0)
     {
         // Do nothing.
     }
@@ -36,6 +36,8 @@ public:
         return m_gcount;
     }
 
+    // TBD - Move from bstream.h: get(), ignore(), peek(), read(), readsome(), seekg(), sync(), tellg(), unget(), operator>>()
+    // TBD - Once obstream is implemented, implement putback()
 protected:
     ///
     /// Number of bits extracted by last input operation.
