@@ -62,77 +62,6 @@ public:
     /// @param[in] buffer Pointer to char array to be accessed.
     /// @param[in] which Open mode.
     /// @param[in] size Number of accessible bits in char array.
-    bitbuf(char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which =
-        std::ios_base::in | std::ios_base::out) :
-        m_buffer(reinterpret_cast<unsigned char *>(buffer)), m_gptr(0),
-        m_egptr(size), m_eback(0)
-    {
-        BOOST_ASSERT(buffer != NULL);
-        BOOST_ASSERT(size >= 0);
-        // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::app) == 0);
-        // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::out) == 0);
-        // Truncate not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
-    }
-
-    ///
-    /// Constructor.
-    ///
-    /// @param[in] buffer Pointer to char array to be accessed.
-    /// @param[in] which Open mode.
-    /// @param[in] size Number of accessible bits in char array.
-    bitbuf(signed char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which =
-        std::ios_base::in | std::ios_base::out) :
-        m_buffer(reinterpret_cast<unsigned char *>(buffer)), m_gptr(0),
-        m_egptr(size), m_eback(0)
-    {
-        BOOST_ASSERT(buffer != NULL);
-        BOOST_ASSERT(size >= 0);
-        // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::app) == 0);
-        // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::out) == 0);
-        // Truncate not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
-    }
-
-    ///
-    /// Constructor.
-    ///
-    /// @param[in] buffer Pointer to char array to be accessed.
-    /// @param[in] which Open mode.
-    /// @param[in] size Number of accessible bits in char array.
-    bitbuf(unsigned char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which =
-        std::ios_base::in | std::ios_base::out) :
-        m_buffer(buffer), m_gptr(0), m_egptr(size), m_eback(0)
-    {
-        BOOST_ASSERT(buffer != NULL);
-        BOOST_ASSERT(size >= 0);
-        // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::app) == 0);
-        // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::out) == 0);
-        // Truncate not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
-    }
-
-    ///
-    /// Constructor.
-    ///
-    /// @param[in] buffer Pointer to char array to be accessed.
-    /// @param[in] which Open mode.
-    /// @param[in] size Number of accessible bits in char array.
     bitbuf(const char *buffer, std::streamsize size = INT_MAX,
         std::ios_base::openmode which =
         std::ios_base::in | std::ios_base::out) :
@@ -152,58 +81,15 @@ public:
     }
 
     ///
-    /// Constructor.
+    /// Get pointer to char-array stream buffer.
     ///
-    /// @param[in] buffer Pointer to char array to be accessed.
-    /// @param[in] which Open mode.
-    /// @param[in] size Number of accessible bits in char array.
-    bitbuf(const signed char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which =
-        std::ios_base::in | std::ios_base::out) :
-        m_buffer(reinterpret_cast<unsigned char *>(const_cast<signed char *>(
-        buffer))), m_gptr(0), m_egptr(size), m_eback(0)
+    /// @note This is analogous to stringbuf::str().
+    ///
+    /// @return Pointer to stream buffer.
+    // TBD - Should this return const?
+    const char *data() const
     {
-        BOOST_ASSERT(buffer != NULL);
-        BOOST_ASSERT(size >= 0);
-        // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::app) == 0);
-        // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::out) == 0);
-        // Truncate not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
-    }
-
-    ///
-    /// Constructor.
-    ///
-    /// @param[in] buffer Pointer to char array to be accessed.
-    /// @param[in] which Open mode.
-    /// @param[in] size Number of accessible bits in char array.
-    bitbuf(const unsigned char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which =
-        std::ios_base::in | std::ios_base::out) :
-        m_buffer(const_cast<unsigned char *>(buffer)), m_gptr(0),
-        m_egptr(size), m_eback(0)
-    {
-        BOOST_ASSERT(buffer != NULL);
-        BOOST_ASSERT(size >= 0);
-        // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::app) == 0);
-        // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::out) == 0);
-        // Truncate not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
-    }
-
-    ///
-    /// Destructor.
-    ~bitbuf()
-    {
-        // Do nothing.
+        return reinterpret_cast<char *>(m_buffer);
     }
 
     ///
@@ -793,7 +679,7 @@ public:
     }
 
     ///
-    /// Get the bitbuf object associated with the stream.
+    /// Get the bitbuf object currently associated with the stream.
     ///
     /// @return A pointer to the bitbuf object associated with the stream.
     bitbuf *rdbuf() const
@@ -801,8 +687,6 @@ public:
         return m_bitbuf;
     }
 
-// TBD - Make bitbuf assignable, e.g,. reset member variables when assigning new value.
-#if 0
     ///
     /// Set the bitbuf object associated with the stream.
     ///
@@ -811,9 +695,9 @@ public:
     {
         bitbuf *previous_bitbuf = m_bitbuf;
         m_bitbuf = bb;
+        m_state = bb == 0 ? std::ios_base::badbit : std::ios_base::goodbit;
         return previous_bitbuf;
     }
-#endif
 
 // TBD - Consider implementing the tie functionality after obstream is implemented.
 #if 0

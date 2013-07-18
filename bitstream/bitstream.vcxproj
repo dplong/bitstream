@@ -21,6 +21,7 @@
     <ClInclude Include="boost\bitstream\bstream.hpp" />
     <ClInclude Include="boost\bitstream\ibstream.hpp" />
     <ClInclude Include="boost\bitstream\iob.hpp" />
+    <ClInclude Include="boost\bitstream\iobmanip.hpp" />
     <ClInclude Include="boost\bstream.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -7,6 +7,7 @@
 // See http://www.boost.org/libs/bitstream for documentation.
 
 #include "boost/bstream.hpp"
+#include "boost/bitstream/iobmanip.hpp"
 #include <cstdint>
 using namespace std;
 using namespace boost::bitstream;
