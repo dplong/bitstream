@@ -1,16 +1,30 @@
-// Copyright (C) 2013 Paul Long.
-//
-// Use, modification, and distribution is subject to the Boost Software
-// License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
-//
-// See http://www.boost.org/libs/bitstream for documentation.
+/** \file
+    \brief Test for input bit-stream class.
+    \details This source file contains a function to test for regression of the
+        input bit-stream class.
+    \copyright Copyright (C) 2013 Paul Long.
+    \note Use, modification, and distribution is subject to the Boost Software
+        License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+        http://www.boost.org/LICENSE_1_0.txt)
+    \see http://www.boost.org/ for latest version.
+    \see http://www.boost.org/libs/bitstream for documentation.
+*/
 
 #include "boost/bstream.hpp"
 #include "boost/bitstream/iobmanip.hpp"
 #include <cstdint>
+
 using namespace std;
 using namespace boost::bitstream;
+
+/**
+    Test input bit-stream class by reading an RTP header.
+
+    This function uses the ibitstream class to read the fields from an
+    ostensible RTP header populated with canned data.
+
+    \return Whether fields were correctly read from the RTP header.
+*/
 bool rtpTest()
 {
     struct {

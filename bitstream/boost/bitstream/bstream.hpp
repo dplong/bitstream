@@ -1,14 +1,13 @@
-// Boost general library bstream.hpp header file //////////////////////////////
-//
-// Copyright (C) 2013 Paul Long.
-//
-// Use, modification, and distribution is subject to the Boost Software
-// License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
-//
-// See http://www.boost.org/ for latest version.
-//
-// See http://www.boost.org/libs/bitstream for documentation.
+/** \file
+    \brief Bit-stream classes.
+    \details This header file contains the bit-stream classes.
+    \copyright Copyright (C) 2013 Paul Long.
+    \note Use, modification, and distribution is subject to the Boost Software
+        License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+        http://www.boost.org/LICENSE_1_0.txt)
+    \see http://www.boost.org/ for latest version.
+    \see http://www.boost.org/libs/bitstream for documentation.
+*/
 
 #ifndef BOOST_BITSTREAM_BSTREAM_HPP
 #define BOOST_BITSTREAM_BSTREAM_HPP
@@ -37,24 +36,26 @@ namespace bitstream {
 
 // ibitstream /////////////////////////////////////////////////////////////////
 
-///
-/// This class provides an interface to manipulate bits as an input stream.
-///
-/// @note This class is based on but does not inherit from the standard class,
-/// istringstream. The main difference is that this class provides access to
-/// bits whereas istringstream provides access to characters.
-///
-/// @note Currently, this class can only be used to read bits from a stream;
-/// however, it could be easily be fleshed out for writing bits, too. For
-/// example, it currently does not support the analogue to the
-/// istringstream::putback method.
+/**
+    This class provides an interface to manipulate bits as an input stream.
+
+    \note This class is based on but does not inherit from the standard class,
+    istringstream. The main difference is that this class provides access to
+    bits whereas istringstream provides access to characters.
+
+    \note Currently, this class can only be used to read bits from a stream;
+    however, it could be easily be fleshed out for writing bits, too. For
+    example, it currently does not support the analogue to the
+    istringstream::putback method.
+*/
 class ibitstream : public ibstream
 {
 public:
-    ///
-    /// Constructor.
-    ///
-    /// @param[in] which Open mode.
+    /**
+        Constructor.
+
+        \param[in] which Open mode.
+    */
     explicit ibitstream(std::ios_base::openmode which = std::ios_base::in) :
         m_bitbuf(which), ibstream(&m_bitbuf)
     {
@@ -68,12 +69,13 @@ public:
         BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
-    ///
-    /// Constructor.
-    ///
-    /// @param[in] buffer Pointer to char array to be accessed.
-    /// @param[in] size Number of accessible bits in char array.
-    /// @param[in] which Open mode.
+    /**
+        Constructor.
+
+        \param[in] buffer Pointer to char array to be accessed.
+        \param[in] size Number of accessible bits in char array.
+        \param[in] which Open mode.
+    */
     explicit ibitstream(const char *buffer, std::streamsize size = INT_MAX,
         std::ios_base::openmode which = std::ios_base::in) :
         m_bitbuf(buffer, size, which), ibstream(&m_bitbuf)
@@ -90,21 +92,23 @@ public:
         BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
-    ///
-    /// Get the bitbuf object associated with the stream upon construction.
-    ///
-    /// @return A pointer to the bitbuf object associated with the stream.
+    /**
+        Get the bitbuf object associated with the stream upon construction.
+
+        \return A pointer to the bitbuf object associated with the stream.
+    */
     bitbuf *rdbuf() const
     {
         return const_cast<bitbuf *>(&m_bitbuf);
     }
 
-    ///
-    /// Get pointer to current contents of the stream.
-    ///
-    /// @note This is analogous to ibitstream::str().
-    ///
-    /// @return Pointer to stream buffer.
+    /**
+        Get pointer to current contents of the stream.
+
+        \note This is analogous to ibitstream::str().
+
+        \return Pointer to stream buffer.
+    */
     // TBD - Should this return const?
     const char *data() const
     {
@@ -112,8 +116,9 @@ public:
     }
 
 private:
-    ///
-    /// Buffer from which this class serially extracts bits.
+    /**
+        Buffer from which this class serially extracts bits.
+    */
     bitbuf m_bitbuf;
 };
 
