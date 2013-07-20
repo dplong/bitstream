@@ -1,5 +1,5 @@
 /** \file
-    \brief Test for input bit-stream class.
+    \brief Regression test for input bit-stream class.
     \details This source file contains a function to test for regression of the
         input bit-stream class.
     \copyright Copyright (C) 2013 Paul Long.
@@ -9,6 +9,14 @@
     \see http://www.boost.org/ for latest version.
     \see http://www.boost.org/libs/bitstream for documentation.
 */
+
+#define BOOST_TEST_MAIN  "bitstream Unit Tests"
+
+#ifdef _MSC_VER
+#  pragma warning(disable : 4224) 
+#endif
+
+#include <boost/test/included/unit_test.hpp>
 
 #include "boost/bstream.hpp"
 #include "boost/bitstream/iobmanip.hpp"
@@ -25,7 +33,7 @@ using namespace boost::bitstream;
 
     \return Whether fields were correctly read from the RTP header.
 */
-bool rtpTest()
+BOOST_AUTO_TEST_CASE(test_rtp)
 {
     struct {
         bool padding, marker;
@@ -56,11 +64,20 @@ bool rtpTest()
             >> setrepeat(extensionLength * sizeof(uint32_t))
             >> rtp.extension.contents;
     }
-    return bin &&
+    BOOST_CHECK(bin &&
         !rtp.padding && !rtp.extension.present &&
         csrcCount.to_ulong() == 0 && rtp.csrcIdentifier.empty() &&
         !rtp.marker && rtp.payloadType.to_ulong() == 8 &&
         rtp.sequenceNumber == 59196 && rtp.timestamp == 13421772 &&
-        rtp.ssrcIdentifier == 3435973836 && rtp.csrcIdentifier.empty();
+        rtp.ssrcIdentifier == 3435973836 && rtp.csrcIdentifier.empty());
 }
 
+/*
+Output:
+
+Running 1 test case...
+
+*** No errors detected
+Press any key to continue . . .
+
+*/
