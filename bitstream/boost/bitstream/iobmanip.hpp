@@ -83,7 +83,7 @@ public:
     /**
         Constructor.
 
-        \param[in] repeat Number of bits to ignore in bit stream.
+        \param[in] bits Number of bits to ignore in bit stream.
     */
     ignore(size_t bits) : m_bits(bits)
     {

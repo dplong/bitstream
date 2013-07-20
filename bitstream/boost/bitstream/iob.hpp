@@ -346,7 +346,7 @@ protected:
     /**
         Advances the get pointer by specified number of bit positions.
 
-        \param[in] Value by which to increase the get pointer.
+        \param[in] offset Value by which to increase the get pointer.
     */
     void gbump(std::streamoff offset)
     {
@@ -573,13 +573,16 @@ private:
     unsigned char *m_buffer;
 };
 
+/**
+    Base class for all bit-stream classes.
+*/
 class iob
 {
 public:
     /**
         Constructor.
 
-        \param[in] Pointer to a bitbuf object.
+        \param[in] bb Pointer to a bitbuf object.
     */
     explicit iob(bitbuf *bb)
     {
@@ -588,8 +591,6 @@ public:
 
     /**
         Destructor.
-
-        \param[in] Pointer to a bitbuf object.
     */
     virtual ~iob()
     {
@@ -784,7 +785,7 @@ protected:
     /**
         Initialize member variables.
 
-        \param[in] Pointer to a bitbuf object.
+        \param[in] bb Pointer to a bitbuf object.
     */
     void init(bitbuf *bb)
     {

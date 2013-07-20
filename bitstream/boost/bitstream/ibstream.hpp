@@ -18,6 +18,9 @@ namespace boost {
 
 namespace bitstream {
 
+/**
+    Input stream objects of this class can read and interpret sequences of bits.
+*/
 class ibstream : public iob
 {
 public:
@@ -187,7 +190,7 @@ public:
         \note Unlike get(), this function returns the bit value in an integral,
         not a bitset.
 
-        \param[out] Integral to receive bits from stream.
+        \param[out] value Integral to receive bits from stream.
         \param[in] bits Number of bits to read.
         \return This bit stream.
     */
@@ -220,7 +223,7 @@ public:
         in memory does not possess the behavior that, unlike istringstream,
         would make readsome() behave any different from read().
 
-        \param[out] Integral to receive bits from stream.
+        \param[out] value Integral to receive bits from stream.
         \param[in] bits Number of bits to read.
         \return This bit stream.
     */
