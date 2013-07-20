@@ -41,10 +41,15 @@ BOOST_AUTO_TEST_CASE(test_rtp)
             >> setrepeat(extensionLength * sizeof(uint32_t))
             >> rtp.extension.contents;
     }
-    BOOST_CHECK(bin &&
-        !rtp.padding && !rtp.extension.present &&
-        csrcCount.to_ulong() == 0 && rtp.csrcIdentifier.empty() &&
-        !rtp.marker && rtp.payloadType.to_ulong() == 8 &&
-        rtp.sequenceNumber == 59196 && rtp.timestamp == 13421772 &&
-        rtp.ssrcIdentifier == 3435973836 && rtp.csrcIdentifier.empty());
+    BOOST_CHECK(bin);
+    BOOST_CHECK(!rtp.padding);
+    BOOST_CHECK(!rtp.extension.present);
+    BOOST_CHECK(csrcCount.to_ulong() == 0);
+    BOOST_CHECK(rtp.csrcIdentifier.empty());
+    BOOST_CHECK(!rtp.marker);
+    BOOST_CHECK(rtp.payloadType.to_ulong() == 8);
+    BOOST_CHECK(rtp.sequenceNumber == 59196);
+    BOOST_CHECK(rtp.timestamp == 13421772);
+    BOOST_CHECK(rtp.ssrcIdentifier == 3435973836);
+    BOOST_CHECK(rtp.csrcIdentifier.empty());
 }
