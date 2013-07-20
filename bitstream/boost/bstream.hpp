@@ -12,6 +12,6 @@
 #ifndef BOOST_BSTREAM_HPP
 #define BOOST_BSTREAM_HPP
 
-#include "boost/bitstream/bstream.hpp"
+#include <boost/bitstream/bstream.hpp>
 
 #endif

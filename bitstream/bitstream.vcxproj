@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_rtp.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="boost\bitstream\bstream.hpp" />
@@ -19,6 +19,8 @@
     <ClInclude Include="boost\bitstream\iob.hpp" />
     <ClInclude Include="boost\bitstream\iobmanip.hpp" />
     <ClInclude Include="boost\bstream.hpp" />
+    <ClInclude Include="test_basic.hpp" />
+    <ClInclude Include="test_rtp.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
@@ -54,11 +56,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\plong\Documents\boost_1_53_0;$(IncludePath)</IncludePath>
+    <IncludePath>./;C:\Users\plong\Documents\boost_1_53_0;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\plong\Documents\boost_1_53_0;$(IncludePath)</IncludePath>
+    <IncludePath>./;C:\Users\plong\Documents\boost_1_53_0;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

@@ -12,7 +12,7 @@
 #ifndef BOOST_BITSTREAM_IOBMANIP_HPP
 #define BOOST_BITSTREAM_IOBMANIP_HPP
 
-#include "boost/bitstream/ibstream.hpp"
+#include <boost/bitstream/ibstream.hpp>
 
 namespace boost {
 

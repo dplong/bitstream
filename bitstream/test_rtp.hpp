@@ -1,7 +1,7 @@
 /** \file
-    \brief Regression test for input bit-stream class.
+    \brief High-level, RTP regression test for input bit-stream class.
     \details This source file contains a function to test for regression of the
-        input bit-stream class.
+        input bit-stream class at a high level by decoding a canned RTP header.
     \copyright Copyright (C) 2013 Paul Long.
     \note Use, modification, and distribution is subject to the Boost Software
         License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -10,29 +10,6 @@
     \see http://www.boost.org/libs/bitstream for documentation.
 */
 
-#define BOOST_TEST_MAIN  "bitstream Unit Tests"
-
-#ifdef _MSC_VER
-#  pragma warning(disable : 4224) 
-#endif
-
-#include <boost/test/included/unit_test.hpp>
-
-#include "boost/bstream.hpp"
-#include "boost/bitstream/iobmanip.hpp"
-#include <cstdint>
-
-using namespace std;
-using namespace boost::bitstream;
-
-/**
-    Test input bit-stream class by reading an RTP header.
-
-    This function uses the ibitstream class to read the fields from an
-    ostensible RTP header populated with canned data.
-
-    \return Whether fields were correctly read from the RTP header.
-*/
 BOOST_AUTO_TEST_CASE(test_rtp)
 {
     struct {
@@ -71,13 +48,3 @@ BOOST_AUTO_TEST_CASE(test_rtp)
         rtp.sequenceNumber == 59196 && rtp.timestamp == 13421772 &&
         rtp.ssrcIdentifier == 3435973836 && rtp.csrcIdentifier.empty());
 }
-
-/*
-Output:
-
-Running 1 test case...
-
-*** No errors detected
-Press any key to continue . . .
-
-*/

@@ -17,9 +17,9 @@
 #include <bitset>
 #include <vector>
 #include <cassert>
-#include "boost/typeof/typeof.hpp"
-#include "boost/assert.hpp"
-#include "boost/bitstream/ibstream.hpp"
+#include <boost/typeof/typeof.hpp>
+#include <boost/assert.hpp>
+#include <boost/bitstream/ibstream.hpp>
 
 // This code uses decltype, which is defined in terms of BOOST's type_of. BOOST
 // only knows about C++'s core types, so we have to tell it about streampos.
