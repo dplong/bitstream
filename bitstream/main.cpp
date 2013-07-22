@@ -14,7 +14,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include "boost/bstream.hpp"
-#include "boost/bitstream/iobmanip.hpp"
+#include "boost/bitstream/iomanip.hpp"
 #include <cstdint>
 
 using namespace std;

@@ -9,10 +9,10 @@
     \see http://www.boost.org/libs/bitstream for documentation.
 */
 
-#ifndef BOOST_BITSTREAM_IOBMANIP_HPP
-#define BOOST_BITSTREAM_IOBMANIP_HPP
+#ifndef BOOST_BITSTREAM_IOMANIP_HPP
+#define BOOST_BITSTREAM_IOMANIP_HPP
 
-#include <boost/bitstream/ibstream.hpp>
+#include <boost/bitstream/istream.hpp>
 
 namespace boost {
 
@@ -42,10 +42,10 @@ public:
     /**
         Overload for the () operator on this class.
 
-        \param[in,out] ibs Reference to ibstream on lhs of >> operator.
-        \return Reference to ibstream parameter.
+        \param[in,out] ibs Reference to istream on lhs of >> operator.
+        \return Reference to istream parameter.
     */
-    ibstream &operator()(ibstream &ibs) const
+    istream &operator()(istream &ibs) const
     {
         return ibs.repeat(m_repeat);
     }
@@ -58,14 +58,14 @@ private:
 };
 
 /**
-    Manipulator for ibstream that sets repeat count for subsequent container
+    Manipulator for istream that sets repeat count for subsequent container
     extractions.
 
-    \param[in,out] ibs Reference to ibstream on left-hand side of operator.
+    \param[in,out] ibs Reference to istream on left-hand side of operator.
     \param[in] repeat Instance of setrepeat class.
-    \return Reference to ibstream parameter.
+    \return Reference to istream parameter.
 */
-inline ibstream &operator>>(ibstream &ibs, setrepeat repeat)
+inline istream &operator>>(istream &ibs, setrepeat repeat)
 {
     return repeat(ibs);
 }
@@ -93,10 +93,10 @@ public:
     /**
         Overload for the () operator on this class.
 
-        \param[in,out] ibs Reference to ibstream on lhs of >> operator.
-        \return Reference to ibstream parameter.
+        \param[in,out] ibs Reference to istream on lhs of >> operator.
+        \return Reference to istream parameter.
     */
-    ibstream &operator()(ibstream &ibs) const
+    istream &operator()(istream &ibs) const
     {
         return ibs.ignore(m_bits);
     }
@@ -109,13 +109,13 @@ private:
 };
 
 /**
-    Manipulator for ibstream that ignores bits.
+    Manipulator for istream that ignores bits.
 
-    \param[in,out] ibs Reference to ibstream on left-hand side of operator.
+    \param[in,out] ibs Reference to istream on left-hand side of operator.
     \param[in] repeat Instance of ignore class.
-    \return Reference to ibstream parameter.
+    \return Reference to istream parameter.
 */
-inline ibstream &operator>>(ibstream &ibs, ignore skip)
+inline istream &operator>>(istream &ibs, ignore skip)
 {
     return skip(ibs);
 }
@@ -174,10 +174,10 @@ public:
     /**
         Overload for the () operator on this class.
 
-        \param[in,out] ibs Reference to ibstream on lhs of >> operator.
-        \return Reference to ibstream parameter.
+        \param[in,out] ibs Reference to istream on lhs of >> operator.
+        \return Reference to istream parameter.
     */
-    ibstream &operator()(ibstream &ibs) const
+    istream &operator()(istream &ibs) const
     {
         return ibs.aligng(m_bits);
     }
@@ -190,13 +190,13 @@ private:
 };
 
 /**
-    Manipulator for ibstream that aligns the get pointer in the input stream.
+    Manipulator for istream that aligns the get pointer in the input stream.
 
-    \param[in,out] ibs Reference to ibstream on left-hand side of operator.
+    \param[in,out] ibs Reference to istream on left-hand side of operator.
     \param[in] align Instance of aligng class.
-    \return Reference to ibstream parameter.
+    \return Reference to istream parameter.
 */
-inline ibstream &operator>>(ibstream &ibs, aligng align)
+inline istream &operator>>(istream &ibs, aligng align)
 {
     return align(ibs);
 }

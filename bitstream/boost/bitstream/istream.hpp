@@ -9,8 +9,8 @@
     \see http://www.boost.org/libs/bitstream for documentation.
 */
 
-#ifndef BOOST_BITSTREAM_IBSTREAM_HPP
-#define BOOST_BITSTREAM_IBSTREAM_HPP
+#ifndef BOOST_BITSTREAM_ISTREAM_HPP
+#define BOOST_BITSTREAM_ISTREAM_HPP
 
 #include <boost/bitstream/iob.hpp>
 
@@ -20,14 +20,16 @@ namespace bitstream {
 
 /**
     Input stream objects of this class can read and interpret sequences of bits.
+
+    \todo Once ostream is implemented, implement putback()
 */
-class ibstream : public iob
+class istream : public iob
 {
 public:
     /**
         Constructor.
     */
-    explicit ibstream(bitbuf *bb) : iob(bb), m_gcount(0), m_gvalue(0), m_repeat(0)
+    explicit istream(bitbuf *bb) : iob(bb), m_gcount(0), m_gvalue(0), m_repeat(0)
     {
         // Do nothing.
     }
@@ -40,12 +42,14 @@ public:
         return m_gcount;
     }
 
-    // TBD - Is this an anaologue of an istream function? For use solely within class?
     /**
         Get value extracted by last input operation.
 
         \note The value returned by this function is only valid if gcount()
-        returns a value greater than zero.
+            returns a value greater than zero.
+
+        \todo Is this an anaologue of a std::istream function? For use solely
+            within class?
 
         \return Most recent extracted value.
     */
@@ -54,10 +58,11 @@ public:
         return m_gvalue;
     }
 
-    // TBD - Support the other get() overloads.
-    // TBD - Should this function return value as int?
     /**
         Get one bit from stream.
+
+        \todo Support the other get() overloads.
+        \todo Should this function return value as int?
 
         \return Next bit from stream.
     */
@@ -83,7 +88,7 @@ public:
         \param[in] bits Number of bits to ignore.
         \return This bit stream.
     */
-    ibstream &ignore(std::streamsize bits = 1)
+    istream &ignore(std::streamsize bits = 1)
     {
         BOOST_ASSERT(bits >= 0);
 
@@ -107,7 +112,7 @@ public:
         \param[in] bit Bit multiple, such as 8 for byte alignment.
         \return This bit stream.
     */
-    ibstream &aligng(size_t bit)
+    istream &aligng(size_t bit)
     {
         BOOST_ASSERT(bit > 0);
         if (good() && bit > 0)
@@ -123,7 +128,7 @@ public:
     /**
         Set repeat count for subsequent vector extractions.
 
-        \note This function does not extract anything from ibstream. It
+        \note This function does not extract anything from istream. It
         merely saves a value that any subsequent vector extractions use to know
         how many bit fields to extract into the same number of vector elements.
 
@@ -131,7 +136,7 @@ public:
         vector.
         \return This bit stream.
     */
-    ibstream &repeat(size_t repeat)
+    istream &repeat(size_t repeat)
     {
         m_repeat = repeat;
 
@@ -187,14 +192,11 @@ public:
     /**
         Get bits from stream.
 
-        \note Unlike get(), this function returns the bit value in an integral,
-        not a bitset.
-
         \param[out] value Integral to receive bits from stream.
         \param[in] bits Number of bits to read.
         \return This bit stream.
     */
-    ibstream &read(bitfield &value, std::streamsize bits)
+    istream &read(bitfield &value, std::streamsize bits)
     {
         BOOST_ASSERT(bits >= 0);
 
@@ -227,7 +229,7 @@ public:
         \param[in] bits Number of bits to read.
         \return This bit stream.
     */
-    ibstream &readsome(bitfield &value, std::streamsize bits)
+    istream &readsome(bitfield &value, std::streamsize bits)
     {
         BOOST_ASSERT(bits >= 0);
 
@@ -241,7 +243,7 @@ public:
         \param[in] dir Bit pointer to which offset is applied.
         \return This bit stream.
     */
-    ibstream &seekg(std::streamoff offset, std::ios_base::seek_dir dir)
+    istream &seekg(std::streamoff offset, std::ios_base::seek_dir dir)
     {
         if (rdbuf()->pubseekoff(offset, dir) ==
             static_cast<std::streampos>(bitbuf::npos))
@@ -258,7 +260,7 @@ public:
         \param[in] position Bit position.
         \return This bit stream.
     */
-    ibstream &seekg(std::streampos position)
+    istream &seekg(std::streampos position)
     {
         BOOST_ASSERT(position >= 0);
 
@@ -296,7 +298,7 @@ public:
 
         \return This bit stream.
     */
-    ibstream &unget()
+    istream &unget()
     {
         m_gcount = 0;
 
@@ -308,8 +310,6 @@ public:
 
         return *this;
     }
-
-    // TBD - Once obstream is implemented, implement putback()
 
 protected:
     /**
@@ -332,11 +332,11 @@ private:
         Friend const functions for access to badbit().
     */
     ///@{
-    template <typename T> friend ibstream &operator>>(ibstream &ibs,
+    template <typename T> friend istream &operator>>(istream &ibs,
         const T &b);
-    template <size_t N> friend ibstream &operator>>(ibstream &ibs,
+    template <size_t N> friend istream &operator>>(istream &ibs,
         const std::bitset<N> &bs);
-    friend ibstream &operator>>(ibstream &ibs, const bool &b);
+    friend istream &operator>>(istream &ibs, const bool &b);
     ///@}
 };
 
@@ -345,13 +345,13 @@ private:
 /**
     Get single bit from input stream and place in bool.
 
-    \param[in,out] ibs Reference to ibstream on left-hand side of operator.
+    \param[in,out] ibs Reference to istream on left-hand side of operator.
     \param[out] b bool on right-hand side of operator.
-    \return Reference to ibstream parameter.
+    \return Reference to istream parameter.
 */
-inline ibstream &operator>>(ibstream &ibs, bool &b)
+inline istream &operator>>(istream &ibs, bool &b)
 {
-    // Extract bit; must be equal to b
+    // Extract bit
     bitfield value;
     ibs.read(value, 1);
     b = value != 0;
@@ -362,11 +362,11 @@ inline ibstream &operator>>(ibstream &ibs, bool &b)
 /**
     Get single bit from input stream that must be equal to bool.
 
-    \param[in,out] ibs Reference to ibstream on left-hand side of operator.
+    \param[in,out] ibs Reference to istream on left-hand side of operator.
     \param[in] b bool on right-hand side of operator.
-    \return Reference to ibstream parameter.
+    \return Reference to istream parameter.
 */
-inline ibstream &operator>>(ibstream &ibs, const bool &b)
+inline istream &operator>>(istream &ibs, const bool &b)
 {
     // Extract bit; must be equal to b
     bitfield value;
@@ -384,12 +384,12 @@ inline ibstream &operator>>(ibstream &ibs, const bool &b)
 /**
     Get bit field from input stream and place in integral.
 
-    \param[in,out] ibs Reference to ibstream on left-hand side of operator.
+    \param[in,out] ibs Reference to istream on left-hand side of operator.
     \param[out] b Integral on right-hand side of operator.
-    \return Reference to ibstream parameter.
+    \return Reference to istream parameter.
 */
 template <typename T>
-ibstream &operator>>(ibstream &ibs, T &b)
+istream &operator>>(istream &ibs, T &b)
 {
     bitfield value;
     ibs.read(value, sizeof(T) * CHAR_BIT);
@@ -401,12 +401,12 @@ ibstream &operator>>(ibstream &ibs, T &b)
 /**
     Get bit field from input stream that must be equal to integral value.
 
-    \param[in,out] ibs Reference to ibstream on left-hand side of operator.
+    \param[in,out] ibs Reference to istream on left-hand side of operator.
     \param[in] b Integral on right-hand side of operator.
-    \return Reference to ibstream parameter.
+    \return Reference to istream parameter.
 */
 template <typename T>
-ibstream &operator>>(ibstream &ibs, const T &b)
+istream &operator>>(istream &ibs, const T &b)
 {
     bitfield value;
     ibs.read(value, sizeof(T) * CHAR_BIT);
@@ -427,12 +427,14 @@ ibstream &operator>>(ibstream &ibs, const T &b)
     push_back(), because it relies on the existing size of the vector to know
     how many bit fields to extract.
 
-    \param[in,out] ibs Reference to ibstream on left-hand side of operator.
+    \todo I thought this used m_repeat, not the size of the vector. Look into.
+
+    \param[in,out] ibs Reference to istream on left-hand side of operator.
     \param[out] v Integral vector on right-hand side of operator.
-    \return Reference to ibstream parameter.
+    \return Reference to istream parameter.
 */
 template <typename T>
-ibstream &operator>>(ibstream &ibs, std::vector<T> &v)
+istream &operator>>(istream &ibs, std::vector<T> &v)
 {
     decltype(v.size()) vector_size = v.size();
     for (decltype(vector_size) i = 0; i < vector_size; ++i) {
@@ -448,12 +450,14 @@ ibstream &operator>>(ibstream &ibs, std::vector<T> &v)
 
     \see Size note for non-const version of this function.
 
-    \param[in,out] ibs Reference to ibstream on left-hand side of operator.
+    \todo I thought this used m_repeat, not the size of the vector. Look into.
+
+    \param[in,out] ibs Reference to istream on left-hand side of operator.
     \param[in] v Integral vector on right-hand side of operator.
-    \return Reference to ibstream parameter.
+    \return Reference to istream parameter.
 */
 template <typename T>
-ibstream &operator>>(ibstream &ibs, std::vector<const T> &v)
+istream &operator>>(istream &ibs, std::vector<const T> &v)
 {
     decltype(v.size()) vectorSize = v.size();
     for (decltype(vectorSize) i = 0; i < vectorSize; ++i) {
@@ -466,12 +470,12 @@ ibstream &operator>>(ibstream &ibs, std::vector<const T> &v)
 /**
     Get bits from input stream and place in bitset.
 
-    \param[in,out] ibs Reference to ibstream on left-hand side of operator.
+    \param[in,out] ibs Reference to istream on left-hand side of operator.
     \param[out] bs bitset on right-hand side of operator.
-    \return Reference to ibstream parameter.
+    \return Reference to istream parameter.
 */
 template <size_t N>
-ibstream &operator>>(ibstream &ibs, std::bitset<N> &bs)
+istream &operator>>(istream &ibs, std::bitset<N> &bs)
 {
     decltype(bs.to_ulong()) value;
     ibs.read(value, N);
@@ -484,12 +488,12 @@ ibstream &operator>>(ibstream &ibs, std::bitset<N> &bs)
 /**
     Get bits from input stream that must be equal to bitset value.
 
-    \param[in,out] ibs Reference to ibstream on left-hand side of operator.
+    \param[in,out] ibs Reference to istream on left-hand side of operator.
     \param[in] bs bitset on right-hand side of operator.
-    \return Reference to ibstream parameter.
+    \return Reference to istream parameter.
 */
 template <size_t N>
-ibstream &operator>>(ibstream &ibs, const std::bitset<N> &bs)
+istream &operator>>(istream &ibs, const std::bitset<N> &bs)
 {
     decltype(bs.to_ulong()) value;
     ibs.read(value, N);

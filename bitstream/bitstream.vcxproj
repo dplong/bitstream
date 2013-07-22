@@ -15,15 +15,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="boost\bitstream\bstream.hpp" />
-    <ClInclude Include="boost\bitstream\ibstream.hpp" />
+    <ClInclude Include="boost\bitstream\istream.hpp" />
     <ClInclude Include="boost\bitstream\iob.hpp" />
-    <ClInclude Include="boost\bitstream\iobmanip.hpp" />
+    <ClInclude Include="boost\bitstream\iomanip.hpp" />
+    <ClInclude Include="boost\bitstream\ostream.hpp" />
     <ClInclude Include="boost\bstream.hpp" />
     <ClInclude Include="test_basic.hpp" />
     <ClInclude Include="test_rtp.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
+    <None Include="mainpage.dox" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{32B51535-86F1-4AB8-8F09-A9045BFF6F10}</ProjectGuid>

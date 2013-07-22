@@ -1,6 +1,6 @@
 /** \file
     \brief High-level, RTP regression test for input bit-stream class.
-    \details This source file contains a function to test for regression of the
+    \details This header file contains a function to test for regression of the
         input bit-stream class at a high level by decoding a canned RTP header.
     \copyright Copyright (C) 2013 Paul Long.
     \note Use, modification, and distribution is subject to the Boost Software

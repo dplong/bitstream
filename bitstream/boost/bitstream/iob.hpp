@@ -89,12 +89,25 @@ public:
 
         \note This is analogous to stringbuf::str().
 
+        \todo Should this return const?
+
         \return Pointer to stream buffer.
     */
-    // TBD - Should this return const?
     const char *data() const
     {
         return reinterpret_cast<char *>(m_buffer);
+    }
+
+    /**
+        Set pointer to char-array stream buffer.
+
+        \note This is analogous to stringbuf::str(x).
+
+        \todo Assure various pointers, etc. are reset to reflect a new pointer.
+    */
+    void data(const char *buffer)
+    {
+        m_buffer = reinterpret_cast<unsigned char *>(const_cast<char *>(buffer));
     }
 
     /**
@@ -748,14 +761,14 @@ public:
         return previous_bitbuf;
     }
 
-// TBD - Consider implementing the tie functionality after obstream is implemented.
+// TBD - Consider implementing the tie functionality after ostream is implemented.
 #if 0
     /**
         Get tied stream.
 
         \return Pointer to stream object tied before call; if none, null pointer.
     */
-    obstream *tie() const
+    ostream *tie() const
     {
         return 0;
     }
@@ -765,7 +778,7 @@ public:
 
         \return Pointer to stream object tied before call; if none, null pointer.
     */
-    obstream *tie(obstream *tieb)
+    ostream *tie(ostream *tieb)
     {
         return 0;
     }

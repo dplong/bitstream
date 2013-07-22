@@ -23,13 +23,7 @@
     <ClInclude Include="boost\bitstream\bstream.hpp">
       <Filter>Header Files\boost/bitstream</Filter>
     </ClInclude>
-    <ClInclude Include="boost\bitstream\ibstream.hpp">
-      <Filter>Header Files\boost/bitstream</Filter>
-    </ClInclude>
     <ClInclude Include="boost\bitstream\iob.hpp">
-      <Filter>Header Files\boost/bitstream</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\bitstream\iobmanip.hpp">
       <Filter>Header Files\boost/bitstream</Filter>
     </ClInclude>
     <ClInclude Include="test_rtp.hpp">
@@ -37,6 +31,15 @@
     </ClInclude>
     <ClInclude Include="test_basic.hpp">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="boost\bitstream\iomanip.hpp">
+      <Filter>Header Files\boost/bitstream</Filter>
+    </ClInclude>
+    <ClInclude Include="boost\bitstream\istream.hpp">
+      <Filter>Header Files\boost/bitstream</Filter>
+    </ClInclude>
+    <ClInclude Include="boost\bitstream\ostream.hpp">
+      <Filter>Header Files\boost/bitstream</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="mainpage.dox">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
