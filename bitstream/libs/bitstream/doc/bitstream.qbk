@@ -1,0 +1,149 @@
+[article bitstream
+    [quickbook 1.6]
+    [copyright 2013 Paul Long]
+    [license
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        [@http://www.boost.org/LICENSE_1_0.txt])
+    ]
+    [authors [Long, Paul]]
+]
+
+
+[/include ../../../../../tools/auto_index/include/auto_index_helpers.qbk]
+[/include ../../../../../boost-trunk/tools/auto_index/include/auto_index_helpers.qbk]
+
+[/ Some links to external sources.]
+[def __boost [@http://www.boost.org/ Boost]]
+[def __boostlicense [@http://www.boost.org/LICENSE_1_0.txt Boost License]]
+
+[/ Links to documentation.]
+[/def __CHECKS_DOC_HTML [@http://boost-sandbox.sourceforge.net/libs/bitstream/doc/html/index.html HTML documentation]]
+[/def __CHECKS_DOC_PDF [@https://svn.boost.org/svn/boost/sandbox/ bitstream/libs/bitstream/doc/bitstream.pdf PDF documentation]]
+
+[/ Links to source code]
+[def __CHECKS_SRC_CODE [@https://svn.boost.org/svn/boost/sandbox/ bitstream/boost/bitstream/boost/ Boost Sandbox bitstream source code.]]
+
+
+[/ Links to C++ reference.]
+[def __BOOST_REGEX__ [@http://www.boost.org/doc/libs/1_53_0/libs/regex/doc/html/index.html Boost.Regex]]
+[def __STD_REGEX__ [@http://en.cppreference.com/w/cpp/regex Standard regex]]
+
+[def __overview [link bitstream.bitstream.preface Preface]]
+[def __tutorial [link bitstream.bitstream.tutorial Tutorial]]
+
+[def __spaces '''&#x2000;&#x2000;'''] [/ two spaces - useful for an indent.]
+
+[section:bitstream bitstream]
+
+The Boost.Bitstream library provides a succinct means to read and write binary data
+using the extraction and insertion operators.
+Its semantics mirror `std::stringstream`, it supports big- and little-endian integrals,
+can be extended to support user-defined types,
+and its performance is comparable to hand-coded codecs.
+
+[section:Tutorial Tutorial]
+
+[import ../example/bitstream_tutorial.cpp]
+[/import ../example/bitstream_example.cpp]
+
+This tutorial introduces `bitstream` by showing how to write a `bool`
+followed by an `int` to a buffer and then reading it back.
+
+[bitstream_tutorial_1]
+
+There is also an example of writing a codec at
+
+[@../../example/bitstream_codec.cpp bitstream_codec.cpp].
+
+
+[endsect] [/section:Tutorial  tutorial]
+
+[section:Testing  Testing]
+
+Tests are provided at
+
+[@../../test/test_basic.cpp test_basic.cpp]
+
+and a more complex test at
+
+[@../../test/test_basic.cpp test_rpt.cpp]
+
+[endsect]
+
+[section:acks Acknowledgements]
+
+The author thanks
+
+* Paul A. Bristow who produced a draft of documentation and other files.
+
+[endsect] [/section:acks Acknowledgements]
+
+[section:refs References]
+
+[endsect] [/section:refs References]
+
+[section:rationale Rationale]
+
+This section records the rationale and compromises for some design decisions.
+
+The proposal was iniated by these
+[@http://boost.2283326.n4.nabble.com/Any-interest-in-bitstream-class-td4649067.html Boost list discussions.]
+
+[endsect] [/section:rationale Rationale]
+
+[section:history History]
+
+# Project started by Paul Long June 2013.
+The proposal was iniated by these
+[@http://boost.2283326.n4.nabble.com/Any-interest-in-bitstream-class-td4649067.html Boost list discussions.]
+
+# First Boost Sandbox release for public comment July 2013.
+
+[endsect] [/section:history History]
+
+[section:version_id Version Info]
+
+Last edit to Quickbook file __FILENAME__ was at __TIME__ on __DATE__.
+
+[warning Home page "Last revised" is GMT, not local time.  Last edit date is local time.]
+
+[endsect] [/section:version_id Version Info]
+
+[endsect] [/section:bitstream Boost.bitstream]
+
+[xinclude autodoc.xml] [/ Using Doxygen reference documentation.]
+
+[/This (if enabled) creates an Index section that include the class, function ... indexes, and also a full index with <index/>]
+[? enable_index
+'''
+  <index type="class_name">
+   <title>Class Index</title>
+  </index>
+
+  <index type="typedef_name">
+  <title>Typedef Index</title>
+  </index>
+
+  <index type="function_name">
+   <title>Function Index</title>
+  </index>
+
+  <index type="macro_name">
+  <title>Macro Index</title>
+  </index>
+
+  <index/>
+
+'''
+]
+[/if enable_index]
+
+[/ bitstream.qbk
+  Copyright 2013 Paul Long.
+  Copyright 2013 Paul A. Bristow.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]

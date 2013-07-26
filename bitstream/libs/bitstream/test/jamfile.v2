@@ -1,0 +1,31 @@
+# Boost bitstream test Jamfile.
+#
+# Copyright Paul Long 2013
+# Copyright Paul A. Bristow 2013
+
+# Distributed under the Boost Software License, Version 1.0. (See
+# accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+
+# Bring in rules for testing.
+import testing ;
+
+project
+    : requirements
+      <toolset>msvc:<warnings>all
+      <toolset>msvc:<asynch-exceptions>on
+      <toolset>msvc:<define>_SCL_SECURE_NO_WARNINGS
+      # <toolset>msvc:<cxxflags>/wd4996 # 'function': was declared deprecated
+      # <toolset>msvc:<cxxflags>/wd4244 # conversion from 'int' to 'unsigned short', possible loss of data
+      # in date-time
+			<include>$(boost-root)
+			<include>. # .cpp files in bitstream/test.
+			<include>../../.. # bitstream .hpp files.
+
+      ;
+
+test-suite bitstream
+  : 
+    [ run test_rtp.cpp ]
+    [ run test_basic.cpp ]
+  ;

@@ -10,6 +10,19 @@
         http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#define BOOST_TEST_MAIN  "bitstream Unit Tests"
+
+#ifdef _MSC_VER
+#  pragma warning(disable : 4224)
+#endif
+
+#include <boost/test/included/unit_test.hpp>
+
+#include <boost/bitstream/bstream.hpp>
+#include <boost/bitstream/iobmanip.hpp>
+
+#include <cstdint>
+
 BOOST_AUTO_TEST_CASE(test_i_construct_with_null)
 {
     boost::bitstream::ibitstream ibs(NULL);

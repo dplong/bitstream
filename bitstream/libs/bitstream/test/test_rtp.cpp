@@ -10,6 +10,20 @@
         http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#define BOOST_TEST_MAIN  "Bitstream Unit Tests"
+
+#ifdef _MSC_VER
+//#  pragma warning(disable : 4224)
+#  pragma warning(disable : 4100)  // unreferenced formal parameter.  TDB  
+#endif
+
+#include <boost/test/included/unit_test.hpp>
+
+#include <boost/bitstream/bstream.hpp>
+#include <boost/bitstream/iomanip.hpp>
+
+#include <cstdint>
+
 BOOST_AUTO_TEST_CASE(test_rtp)
 {
     struct {

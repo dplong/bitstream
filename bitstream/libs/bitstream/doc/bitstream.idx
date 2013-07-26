@@ -1,0 +1,45 @@
+# bitstream.idx list of files and keyword to be indexed.
+
+# Copyright (c) 2013 Paul Long
+# Copyright (c) 2013 Paul A. Bristow
+#
+# Use, modification and distribution is subject to the Boost Software
+# License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+
+!scan-path "boost/bitstream/" ".*\.*pp" true
+# recurse in any sub-directories.
+
+# List of terms in the docbook (from Quickbook) to be indexed.
+# Convenient to order these alphabetically.
+
+# TODO - add more!
+
+acknowledgements
+book
+C++ \<C|C++\>
+card
+credit
+deprecated
+Doxygen
+example \<example\w*\>
+equations \<equation\w*\>
+graphics \<graphic\w*\>
+links \<link\w*\>
+images \<image\w*\>
+italic \<italic\w*\>
+# index index and indexes (assume not using plural indices!)
+index  \<index\w*\>
+path  \<path\w*\>
+pre-conditions \<pre\w*\>
+post-conditions \<post\w*\>
+remark \<remark\w*\>
+snippet  \<snippet\w*\>
+png
+Quickbook
+version \<version\w*\>
+warning \<warning\w*\>
+
+# Remove leading "A" or "The" prefixes from section titles.
+!rewrite-name "(?:A|An|The)\s+(.*)" "\1"
+
