@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitstream", "bitstream\bitstream.vcxproj", "{32B51535-86F1-4AB8-8F09-A9045BFF6F10}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_basic", "test_basic\test_basic.vcxproj", "{C94FE0F0-42BC-4AF0-BDAD-1855F1730DF4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_rtp", "test_rtp\test_rtp.vcxproj", "{3C8ED5F4-528C-4E07-9A29-E2EFFBBF55B3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{32B51535-86F1-4AB8-8F09-A9045BFF6F10}.Debug|Win32.ActiveCfg = Debug|Win32
+		{32B51535-86F1-4AB8-8F09-A9045BFF6F10}.Debug|Win32.Build.0 = Debug|Win32
+		{32B51535-86F1-4AB8-8F09-A9045BFF6F10}.Release|Win32.ActiveCfg = Release|Win32
+		{32B51535-86F1-4AB8-8F09-A9045BFF6F10}.Release|Win32.Build.0 = Release|Win32
+		{C94FE0F0-42BC-4AF0-BDAD-1855F1730DF4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C94FE0F0-42BC-4AF0-BDAD-1855F1730DF4}.Debug|Win32.Build.0 = Debug|Win32
+		{C94FE0F0-42BC-4AF0-BDAD-1855F1730DF4}.Release|Win32.ActiveCfg = Release|Win32
+		{C94FE0F0-42BC-4AF0-BDAD-1855F1730DF4}.Release|Win32.Build.0 = Release|Win32
+		{3C8ED5F4-528C-4E07-9A29-E2EFFBBF55B3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3C8ED5F4-528C-4E07-9A29-E2EFFBBF55B3}.Debug|Win32.Build.0 = Debug|Win32
+		{3C8ED5F4-528C-4E07-9A29-E2EFFBBF55B3}.Release|Win32.ActiveCfg = Release|Win32
+		{3C8ED5F4-528C-4E07-9A29-E2EFFBBF55B3}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
