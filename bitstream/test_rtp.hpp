@@ -2,43 +2,43 @@
     \brief High-level, RTP regression test for input bit-stream class.
     \details This header file contains a function to test for regression of the
         input bit-stream class at a high level by decoding a canned RTP header.
-    \copyright Copyright (C) 2013 Paul Long.
-    \note Use, modification, and distribution is subject to the Boost Software
-        License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt)
     \see http://www.boost.org/ for latest version.
     \see http://www.boost.org/libs/bitstream for documentation.
+
+    Use, modification, and distribution is subject to the Boost Software
+        License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+        http://www.boost.org/LICENSE_1_0.txt)
 */
 
 BOOST_AUTO_TEST_CASE(test_rtp)
 {
     struct {
         bool padding, marker;
-        bitset<7> payloadType;
+        std::bitset<7> payloadType;
         uint16_t sequenceNumber;
         uint32_t timestamp, ssrcIdentifier;
-        vector<uint32_t> csrcIdentifier;
+        std::vector<uint32_t> csrcIdentifier;
         struct {
             bool present;
             uint16_t identifier;
-            vector<uint8_t> contents;
+            std::vector<uint8_t> contents;
         } extension;
     } rtp;
 
-    const string rtpHeader("\x80\x08\xe7\x3c\x00\x00\x3c\x00\xde\xe0\xee\x8f");
+    const std::string rtpHeader("\x80\x08\xe7\x3c\x00\x00\x3c\x00\xde\xe0\xee\x8f");
 
-    ibitstream bin(rtpHeader.c_str());
-    static const bitset<2> version(0x2);
-    bitset<4> csrcCount;
+    boost::bitstream::ibitstream bin(rtpHeader.c_str());
+    static const std::bitset<2> version(0x2);
+    std::bitset<4> csrcCount;
     uint16_t extensionLength = 0;
 
     bin >> version >> rtp.padding >> rtp.extension.present
         >> csrcCount >> rtp.marker >> rtp.payloadType
         >> rtp.sequenceNumber >> rtp.timestamp >> rtp.ssrcIdentifier
-        >> setrepeat(csrcCount.to_ulong()) >> rtp.csrcIdentifier;
+        >> boost::bitstream::setrepeat(csrcCount.to_ulong()) >> rtp.csrcIdentifier;
     if (rtp.extension.present) {
         bin >> rtp.extension.identifier >> extensionLength
-            >> setrepeat(extensionLength * sizeof(uint32_t))
+            >> boost::bitstream::setrepeat(extensionLength * sizeof(uint32_t))
             >> rtp.extension.contents;
     }
     BOOST_CHECK(bin);

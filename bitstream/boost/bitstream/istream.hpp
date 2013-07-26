@@ -1,12 +1,12 @@
 /** \file
     \brief Input bit-stream classes.
     \details This header file contains the input bit-stream classes.
-    \copyright Copyright (C) 2013 Paul Long.
-    \note Use, modification, and distribution is subject to the Boost Software
-        License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt)
     \see http://www.boost.org/ for latest version.
     \see http://www.boost.org/libs/bitstream for documentation.
+
+    Use, modification, and distribution is subject to the Boost Software
+        License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+        http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef BOOST_BITSTREAM_ISTREAM_HPP

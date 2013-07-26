@@ -3,12 +3,12 @@
     \details This header file contains base classes and types for the
         bit-stream hierarchy of classes.
     \details parametric manipulators for bit streams.
-    \copyright Copyright (C) 2013 Paul Long.
-    \note Use, modification, and distribution is subject to the Boost Software
-        License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-        http://www.boost.org/LICENSE_1_0.txt)
     \see http://www.boost.org/ for latest version.
     \see http://www.boost.org/libs/bitstream for documentation.
+
+    Use, modification, and distribution is subject to the Boost Software
+        License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+        http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #ifndef BOOST_BITSTREAM_IOB_HPP
@@ -191,7 +191,7 @@ public:
         Get current bit and advance get pointer.
 
         \param[out] value Current bit before advancing pointer.
-        \return Whether okay--eof has not been encountered.
+        \return Whether okay (eof has not been encountered).
     */
     bool sbumpb(bitfield &value)
     {
@@ -202,7 +202,7 @@ public:
         Get current bit at get pointer.
 
         \param[out] value Current bit.
-        \return Whether okay--eof has not been encountered.
+        \return Whether okay (eof has not been encountered).
     */
     bool sgetb(bitfield &value)
     {
@@ -234,7 +234,7 @@ public:
         Advance get pointer and return next bit.
 
         \param[out] value Next bit.
-        \return Whether okay--eof has not been encountered.
+        \return Whether okay (eof has not been encountered).
     */
     bool snextb(bitfield &value)
     {
@@ -257,7 +257,7 @@ public:
         Move get pointer backwards and return bit at new position.
 
         \param[out] value Bit before position prior to call.
-        \return Whether okay--eof has not been encountered.
+        \return Whether okay (eof has not been encountered).
     */
     bool sungetb(bitfield &value)
     {
@@ -468,7 +468,7 @@ protected:
         Synchronize stream buffer with input or output device.
 
         \note Since we do not currently have an I/O device with which to
-        synchronize--we are unbuffered--this function always returns in error
+        synchronize (we are unbuffered) this function always returns in error
         with -1.
 
         \return 0 if buffered stream and successful; -1 otherwise.
@@ -719,7 +719,7 @@ public:
     /**
         Set error state flags.
 
-        \note This function sets states additively--no state is cleared.
+        \note This function sets states additively (no state is cleared).
 
         \param[in] state Error state flags.
     */

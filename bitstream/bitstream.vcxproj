@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="boost\bitstream\bstream.hpp" />
@@ -19,7 +19,6 @@
     <ClInclude Include="boost\bitstream\iob.hpp" />
     <ClInclude Include="boost\bitstream\iomanip.hpp" />
     <ClInclude Include="boost\bitstream\ostream.hpp" />
-    <ClInclude Include="boost\bstream.hpp" />
     <ClInclude Include="test_basic.hpp" />
     <ClInclude Include="test_rtp.hpp" />
   </ItemGroup>
