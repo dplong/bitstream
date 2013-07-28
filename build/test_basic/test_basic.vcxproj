@@ -58,7 +58,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
-      <AdditionalIncludeDirectories>..\..\..\..\bitstream;C:\Users\plong\Documents\boost_1_53_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\bitstream;C:\Users\plong\Documents\boost_1_53_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -75,7 +75,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
-      <AdditionalIncludeDirectories>..\..\..\..\bitstream;C:\Users\plong\Documents\boost_1_53_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\bitstream;C:\Users\plong\Documents\boost_1_53_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

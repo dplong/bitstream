@@ -19,7 +19,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <boost/bitstream/bstream.hpp>
-#include <boost/bitstream/iobmanip.hpp>
+#include <boost/bitstream/iomanip.hpp>
 
 #include <cstdint>
 

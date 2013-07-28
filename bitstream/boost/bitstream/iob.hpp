@@ -53,8 +53,6 @@ public:
         BOOST_ASSERT((which & std::ios_base::app) == 0);
         // Output not support, so can't append each time.
         BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::out) == 0);
         // Truncate not currently supported.
         BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
@@ -78,8 +76,6 @@ public:
         BOOST_ASSERT((which & std::ios_base::app) == 0);
         // Output not support, so can't append each time.
         BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::out) == 0);
         // Truncate not currently supported.
         BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }

@@ -59,8 +59,6 @@ public:
         BOOST_ASSERT((which & std::ios_base::app) == 0);
         // Input at end of stream? Huh?
         BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::out) == 0);
         // Truncate not currently supported.
         BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
@@ -82,8 +80,6 @@ public:
         BOOST_ASSERT((which & std::ios_base::app) == 0);
         // Input at end of stream? Huh?
         BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::out) == 0);
         // Truncate not currently supported.
         BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
@@ -135,7 +131,7 @@ public:
 
         \param[in] which Open mode.
     */
-    explicit obitstream(std::ios_base::openmode which = std::ios_base::in) :
+    explicit obitstream(std::ios_base::openmode which = std::ios_base::out) :
         m_bitbuf(which), ostream(&m_bitbuf)
     {
         // TBD
@@ -144,8 +140,6 @@ public:
         BOOST_ASSERT((which & std::ios_base::app) == 0);
         // Input at end of stream? Huh?
         BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::out) == 0);
         // Truncate not currently supported.
         BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
@@ -158,7 +152,7 @@ public:
         \param[in] which Open mode.
     */
     explicit obitstream(const char *buffer, std::streamsize size = INT_MAX,
-        std::ios_base::openmode which = std::ios_base::in) :
+        std::ios_base::openmode which = std::ios_base::out) :
         m_bitbuf(buffer, size, which), ostream(&m_bitbuf)
     {
         // TBD
@@ -169,8 +163,6 @@ public:
         BOOST_ASSERT((which & std::ios_base::app) == 0);
         // Input at end of stream? Huh?
         BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Output not currently supported.
-        BOOST_ASSERT((which & std::ios_base::out) == 0);
         // Truncate not currently supported.
         BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
