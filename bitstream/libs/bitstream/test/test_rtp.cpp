@@ -26,8 +26,9 @@
 
 BOOST_AUTO_TEST_CASE(test_rtp)
 {
-    struct {
-        bool padding, marker;
+    struct Rtp {
+		const std::bitset<2> version = 0x2;
+		bool padding, marker;
         std::bitset<7> payloadType;
         uint16_t sequenceNumber;
         uint32_t timestamp, ssrcIdentifier;
@@ -42,18 +43,19 @@ BOOST_AUTO_TEST_CASE(test_rtp)
     const std::string rtpHeader("\x80\x08\xe7\x3c\x00\x00\x3c\x00\xde\xe0\xee\x8f");
 
     boost::bitstream::ibitstream bin(rtpHeader.c_str());
-    static const std::bitset<2> version(0x2);
-    std::bitset<4> csrcCount;
+
+	std::bitset<4> csrcCount;
     uint16_t extensionLength = 0;
 
-    bin >> version >> rtp.padding >> rtp.extension.present
-        >> csrcCount >> rtp.marker >> rtp.payloadType
-        >> rtp.sequenceNumber >> rtp.timestamp >> rtp.ssrcIdentifier
-        >> boost::bitstream::setrepeat(csrcCount.to_ulong()) >> rtp.csrcIdentifier;
+	bin >> rtp.version >> rtp.padding >> rtp.extension.present
+		>> csrcCount >> rtp.marker >> rtp.payloadType
+		>> rtp.sequenceNumber >> rtp.timestamp >> rtp.ssrcIdentifier;
+	rtp.csrcIdentifier.resize(csrcCount.to_ulong());
+	bin >> rtp.csrcIdentifier;
     if (rtp.extension.present) {
-        bin >> rtp.extension.identifier >> extensionLength
-            >> boost::bitstream::setrepeat(extensionLength * sizeof(uint32_t))
-            >> rtp.extension.contents;
+		bin >> rtp.extension.identifier >> extensionLength;
+		rtp.extension.contents.resize(extensionLength * sizeof(uint32_t));
+        bin >> rtp.extension.contents;
     }
     BOOST_CHECK(bin);
     BOOST_CHECK(!rtp.padding);
@@ -66,4 +68,17 @@ BOOST_AUTO_TEST_CASE(test_rtp)
     BOOST_CHECK(rtp.timestamp == 13421772);
     BOOST_CHECK(rtp.ssrcIdentifier == 3435973836);
     BOOST_CHECK(rtp.csrcIdentifier.empty());
+
+	boost::bitstream::obitstream bout;
+#if 0
+	bout << rtp.version << rtp.padding << rtp.extension.present
+		<< std::bitset<4>(rtp.csrcIdentifier.size()) << rtp.marker << rtp.payloadType
+		<< rtp.sequenceNumber << rtp.timestamp << rtp.ssrcIdentifier
+		<< rtp.csrcIdentifier;
+	if (rtp.extension.present) {
+		bout << rtp.extension.identifier << rtp.extension.contents.size() / sizeof(uint32_t)
+			<< rtp.extension.contents;
+	}
+	BOOST_CHECK(memcmp(bout.data(), rtpHeader.c_str(), rtpHeader.size()) == 0);
+#endif
 }

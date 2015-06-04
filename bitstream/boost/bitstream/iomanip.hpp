@@ -25,6 +25,8 @@ namespace bitstream {
     \note This is a roundabout but necessary way of implementing manipulators
     that take parameters, such as the setprecision() manipulator.
 */
+// TBD - Also needed for ostream.
+// TBD - How does one "unset" this? Maybe it's a one-shot setting that automatically "unsets" after being used?
 class setrepeat
 {
 public:

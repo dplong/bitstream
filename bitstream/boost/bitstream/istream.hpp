@@ -334,6 +334,7 @@ private:
     ///@{
     template <typename T> friend istream &operator>>(istream &ibs,
         const T &b);
+	// TBD - Also support vector<bool> >>/<< operators?
     template <size_t N> friend istream &operator>>(istream &ibs,
         const std::bitset<N> &bs);
     friend istream &operator>>(istream &ibs, const bool &b);

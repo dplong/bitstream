@@ -101,7 +101,9 @@ public:
 
         \return Pointer to stream buffer.
     */
-    // TBD - Should this return const?
+	// TBD - Need to also return size somehow, but what if begin bit position
+	// is not 0, e.g., for iobitstream/bitstream class? Need (bit) size() and
+	// begin bit position accessors? 
     const char *data() const
     {
         return iob::rdbuf()->data();
@@ -184,7 +186,7 @@ public:
 
         \return Pointer to stream buffer.
     */
-    // TBD - Should this return const?
+	// TBD - How does the user know how long the buffer is? Maybe just return as std::string().
     const char *data() const
     {
         return iob::rdbuf()->data();

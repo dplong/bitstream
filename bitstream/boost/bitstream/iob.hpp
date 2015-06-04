@@ -85,8 +85,6 @@ public:
 
         \note This is analogous to stringbuf::str().
 
-        \todo Should this return const?
-
         \return Pointer to stream buffer.
     */
     const char *data() const
