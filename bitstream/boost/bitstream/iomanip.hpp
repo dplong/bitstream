@@ -13,6 +13,7 @@
 #define BOOST_BITSTREAM_IOMANIP_HPP
 
 #include <boost/bitstream/istream.hpp>
+#include <boost/bitstream/ostream.hpp>
 
 namespace boost {
 
@@ -23,18 +24,16 @@ namespace bitstream {
     This class represents the setrepeat bit-stream manipulator.
 
     \note This is a roundabout but necessary way of implementing manipulators
-    that take parameters, such as the setprecision() manipulator.
+    that take parameters, such as the std::setprecision() manipulator.
 */
-// TBD - Also needed for ostream.
-// TBD - How does one "unset" this? Maybe it's a one-shot setting that automatically "unsets" after being used?
 class setrepeat
 {
 public:
     /**
         Constructor.
 
-        \param[in] repeat Number of bit fields to extract to each subsequent
-        integral container.
+        \param[in] repeat Number of bit fields to extract/insert to each
+		subsequent bit-field container.
     */
     setrepeat(size_t repeat) : m_repeat(repeat)
     {
@@ -42,7 +41,7 @@ public:
     }
 
     /**
-        Overload for the () operator on this class.
+        Overload for the (istream &) operator on this class.
 
         \param[in,out] ibs Reference to istream on lhs of >> operator.
         \return Reference to istream parameter.
@@ -52,9 +51,20 @@ public:
         return ibs.repeat(m_repeat);
     }
 
+	/**
+		Overload for the (ostream &) operator on this class.
+
+		\param[in,out] obs Reference to ostream on lhs of >> operator.
+		\return Reference to ostream parameter.
+	*/
+	ostream &operator()(ostream &obs) const
+	{
+		return obs.repeat(m_repeat);
+	}
+
 private:
     /**
-        Number of bit fields to extract per container.
+        Number of bit fields to extract/insert per container.
     */
     size_t m_repeat;
 };
@@ -70,6 +80,19 @@ private:
 inline istream &operator>>(istream &ibs, setrepeat repeat)
 {
     return repeat(ibs);
+}
+
+/**
+	Manipulator for ostream that sets repeat count for subsequent container
+	insertions.
+
+	\param[in,out] obs Reference to ostream on left-hand side of operator.
+	\param[in] repeat Instance of setrepeat class.
+	\return Reference to ostream parameter.
+*/
+inline ostream &operator>>(ostream &obs, setrepeat repeat)
+{
+	return repeat(obs);
 }
 ///@}
 
@@ -145,7 +168,7 @@ inline istream &operator>>(istream &ibs, ignore skip)
     \code
     // Advance get pointer to next word.
     bitset<16> sequenceNumber;
-    ibitstream(rtpHeader).aligng(sizeof(WORD) * CHAR_BIT) >> sequenceNumber;
+    ibitstream(rtpHeader).aligng(sizeof(WORD) * std::numeric_limits<unsigned char>::digits) >> sequenceNumber;
     \endcode
 
     \code

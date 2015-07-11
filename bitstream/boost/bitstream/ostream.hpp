@@ -13,14 +13,13 @@
 #define BOOST_BITSTREAM_OSTREAM_HPP
 
 #include <boost/bitstream/iob.hpp>
+#include <boost/spirit/home/support/container.hpp>
 
 namespace boost {
 
 namespace bitstream {
 /**
     Output stream objects of this class can write sequences of bits.
-
-    \todo Once implemented, implement putback()
 */
 class ostream : public iob
 {
@@ -28,20 +27,37 @@ public:
     /**
         Constructor.
     */
-    explicit ostream(bitbuf *bb) : iob(bb)
+    explicit ostream(bitbuf *bb) : iob(bb), m_repeat(0)
     {
         // Do nothing.
     }
 
+	/**
+		Get repeat value.
+
+		\note If this value is 0, repetitive vector insertion occurs based on
+		vector size. Otherwise, this many insertions are done.
+
+		\return Repeat value.
+	*/
+	size_t repeat() const
+	{
+		return m_repeat;
+	}
+
     /**
         Put one bit to stream.
 
-        \param[in] value Value to write to stream.
-        \return Reference to this object?
-    */
+        \param[in] value Bit to write to stream.
+		\return This bit stream.
+	*/
     ostream &put(bitfield value)
     {
-        // TBD
+		if (good() && !rdbuf()->sputb(value))
+		{
+			failbit();
+		}
+
         return *this;
     }
 
@@ -53,9 +69,31 @@ public:
     */
     ostream &alignp(size_t bit)
     {
-        // TBD
-        return *this;
-    }
+		if (good() && bit > 0)
+		{
+			seekp(((static_cast<size_t>(tellp()) + bit - 1) / bit) * bit);
+		}
+
+		return *this;
+	}
+
+	/**
+		Set repeat count for subsequent vector insertions.
+
+		\note This function does not insert anything to ostream. It merely
+		saves a value that any subsequent vector insertions use to know how
+		many bit fields to insert from the same number of vector elements.
+
+		\param repeat Number of bit fields to extract to each subsequent
+		vector.
+		\return This bit stream.
+	*/
+	ostream &repeat(size_t repeat)
+	{
+		m_repeat = repeat;
+
+		return *this;
+	}
 
     /**
         Determine whether put pointer is aligned to bit multiple.
@@ -77,7 +115,11 @@ public:
     */
     ostream &write(bitfield value, std::streamsize bits)
     {
-        // TBD
+		if (good() && !rdbuf()->sputn(value, bits))
+		{
+			badbit();
+		}
+
         return *this;
     }
 
@@ -90,7 +132,11 @@ public:
     */
     ostream &seekp(std::streamoff offset, std::ios_base::seek_dir dir)
     {
-        // TBD
+		if (!fail() && rdbuf()->pubseekoff(offset, dir) == std::streampos(-1))
+		{
+			failbit();
+		}
+
         return *this;
     }
 
@@ -102,8 +148,12 @@ public:
     */
     ostream &seekp(std::streampos position)
     {
-        // TBD
-        return *this;
+		if (!fail() && rdbuf()->pubseekpos(position) == std::streampos(-1))
+		{
+			failbit();
+		}
+		
+		return *this;
     }
 
     /**
@@ -113,31 +163,37 @@ public:
     */
     std::streampos tellp()
     {
-        // TBD
-        return 0;
+		return fail() ? std::streampos(-1) :
+			rdbuf()->pubseekoff(0, std::ios_base::cur, std::ios_base::out);
     }
 
     /**
         Synchronize output buffer with destination of bits.
 
+		\note This currently does nothing because there are no intermediate
+		buffers to write.
+
         \return This bit stream.
     */
     ostream &flush()
     {
-        // TBD
         return *this;
     }
+
+protected:
+	/**
+		Number of bit fields inserted from a container.
+	*/
+	size_t m_repeat;
 
 private:
     /**
         Friend const functions for access to badbit().
     */
     ///@{
-    template <typename T> friend ostream &operator<<(ostream &obs,
-        T b);
     template <size_t N> friend ostream &operator<<(ostream &obs,
         const std::bitset<N> &bs);
-    friend ostream &operator<<(ostream &obs, bool b);
+    friend ostream &operator<<(ostream &obs, const bool b);
     ///@}
 };
 
@@ -152,43 +208,12 @@ private:
 */
 inline ostream &operator<<(ostream &obs, bool b)
 {
-    // TBD - Is cast necessary?
-    return obs.write(static_cast<bitfield>(b != 0), 1);
+    return obs.write(b != 0, 1);
 }
 
 // Templates //////////////////////////////////////////////////////////////////
 
-/**
-    Put integral bit field to input stream.
-
-    \param[in,out] obs Reference to ostream on left-hand side of operator.
-    \param[out] b Integral on right-hand side of operator.
-    \return Reference to ostream parameter.
-*/
-template <typename T>
-ostream &operator<<(ostream &obs, T b)
-{
-    // TBD - Is cast necessary?
-    return obs.write(static_cast<bitfield>(b), sizeof(T) * CHAR_BIT);
-}
-
-/**
-    Put integral vector to output stream.
-
-    \param[in,out] obs Reference to ostream on left-hand side of operator.
-    \param[out] v Integral vector on right-hand side of operator.
-    \return Reference to ostream parameter.
-*/
-template <typename T>
-ostream &operator<<(ostream &obs, const std::vector<T> &v)
-{
-    BOOST_FOREACH(const T &datum, v)
-    {
-        obs << datum;
-    }
-
-    return obs;
-}
+// Templates for scalars //////////////////////////////////////////
 
 /**
     Put bits from bitset to output stream.
@@ -198,10 +223,86 @@ ostream &operator<<(ostream &obs, const std::vector<T> &v)
     \return Reference to ostream parameter.
 */
 template <size_t N>
+ostream &operator<<(ostream &obs, std::bitset<N> &bs)
+{
+    return obs.write(bs.to_ulong(), N);
+}
+
+/**
+	Put bits from bitset to output stream.
+
+	\param[in,out] obs Reference to ostream on left-hand side of operator.
+	\param[out] bs bitset on right-hand side of operator.
+	\return Reference to ostream parameter.
+*/
+template <size_t N>
 ostream &operator<<(ostream &obs, const std::bitset<N> &bs)
 {
-    // TBD - Is cast necessary?
-    return obs.write(static_cast<bitfield &>(bs.to_ulong()), N);
+	return obs.write(bs.to_ulong(), N);
+}
+
+/**
+	Put integral bit field to input stream.
+
+	\param[in,out] obs Reference to ostream on left-hand side of operator.
+	\param[out] b Integral on right-hand side of operator.
+	\return Reference to ostream parameter.
+*/
+template <typename T>
+typename boost::enable_if_c<
+	!boost::spirit::traits::is_container<T>::value,
+	ostream &
+>::type
+operator<<(ostream &obs, const T &b)
+{
+	return obs.write(static_cast<bitfield>(b),
+		sizeof(T) * std::numeric_limits<unsigned char>::digits);
+}
+
+// Templates for sequence containers //////////////////////////////////////////
+
+/**
+	Put bit fields from containter to output stream.
+
+	\param[in,out] obs Reference to ostream on left-hand side of operator.
+	\param[in] c Container on right-hand side of operator.
+	\return Reference to ostream parameter.
+*/
+template <typename C>
+typename boost::enable_if_c<
+	boost::spirit::traits::is_container<C>::value,
+	ostream &
+>::type
+operator<<(ostream &obs, C &c)
+{
+	for (BOOST_AUTO_TPL(it, c.begin()); it != c.end(); ++it)
+	{
+		obs << *it;
+	}
+
+	return obs;
+}
+
+/**
+	Put bit fields from containter to output stream.
+
+	\param[in,out] obs Reference to ostream on left-hand side of operator.
+	\param[in] c Container on right-hand side of operator.
+	\return Reference to ostream parameter.
+*/
+template <typename C>
+typename boost::enable_if_c<
+	boost::spirit::traits::is_container<C>::value,
+	ostream &
+>::type
+operator<<(ostream &obs, const C &c)
+{
+	for (BOOST_AUTO_TPL(it, c.begin()); it != c.end(); ++it)
+	{
+		obs << *it;
+	}
+
+	return obs;
 }
 
 } // namespace bitstream

@@ -13,6 +13,7 @@
 #define BOOST_BITSTREAM_ISTREAM_HPP
 
 #include <boost/bitstream/iob.hpp>
+#include <boost/spirit/home/support/container.hpp>
 
 namespace boost {
 
@@ -20,8 +21,6 @@ namespace bitstream {
 
 /**
     Input stream objects of this class can read and interpret sequences of bits.
-
-    \todo Once ostream is implemented, implement putback()
 */
 class istream : public iob
 {
@@ -42,31 +41,25 @@ public:
         return m_gcount;
     }
 
-    /**
-        Get value extracted by last input operation.
+	/**
+		Get repeat value.
 
-        \note The value returned by this function is only valid if gcount()
-            returns a value greater than zero.
+		\note If this value is 0, repetitive vector extraction occurs based on
+		vector size. Otherwise, this many extractions are done.
 
-        \todo Is this an anaologue of a std::istream function? For use solely
-            within class?
-
-        \return Most recent extracted value.
-    */
-    bitfield gvalue() const
-    {
-        return m_gvalue;
-    }
+		\return Repeat value.
+	*/
+	size_t repeat() const
+	{
+		return m_repeat;
+	}
 
     /**
         Get one bit from stream.
 
-        \todo Support the other get() overloads.
-        \todo Should this function return value as int?
-
         \return Next bit from stream.
     */
-    bitfield get()
+    int get()
     {
         if (!rdbuf()->sbumpb(m_gvalue))
         {
@@ -79,8 +72,50 @@ public:
             m_gcount = 1;
         }
 
-        return m_gvalue;
+        return static_cast<int>(m_gvalue);
     }
+
+	/**
+		Get one bit from stream.
+
+		\param[out] value Integral to receive bit from stream.
+		\return This bit stream.
+		*/
+	istream &get(bitfield &value)
+	{
+		value = get();
+
+		return *this;
+	}
+
+	/**
+		Get bits from stream.
+
+		\param[out] value Integral to receive bits from stream.
+		\param[in] bits Number of bits to read.
+		\return This bit stream.
+	*/
+	istream &get(bitfield &value, std::streamsize n)
+	{
+		return read(value, n);
+	}
+
+	/**
+		Reads available bits and inserts them to the bitbuf object.
+
+		\note Bits are extracted and inserted into bb until end of file
+		condition occurs in the input sequence or inserting into the output
+		sequence fails (in which case the bit that could not be inserted, is
+		not extracted).
+
+		\param[in] bb bitbuf object into which bits are inserted.
+		\return This bit stream.
+	*/
+	istream &get(bitbuf &bb)
+	{
+		// TBD
+		return *this;
+	}
 
     /**
         Ignore, or skip over, bits in stream.
@@ -92,8 +127,7 @@ public:
     {
         BOOST_ASSERT(bits >= 0);
 
-        if (rdbuf()->pubseekoff(bits, std::ios_base::cur) ==
-            static_cast<std::streampos>(bitbuf::npos))
+        if (rdbuf()->pubseekoff(bits, std::ios_base::cur) == std::streampos(-1))
         {
             eofbit();
             m_gcount = 0;
@@ -115,6 +149,7 @@ public:
     istream &aligng(size_t bit)
     {
         BOOST_ASSERT(bit > 0);
+
         if (good() && bit > 0)
         {
             seekg(((static_cast<size_t>(tellg()) + bit - 1) / bit) * bit);
@@ -128,9 +163,9 @@ public:
     /**
         Set repeat count for subsequent vector extractions.
 
-        \note This function does not extract anything from istream. It
-        merely saves a value that any subsequent vector extractions use to know
-        how many bit fields to extract into the same number of vector elements.
+        \note This function does not extract anything from istream. It merely
+		saves a value that any subsequent vector extractions use to know how
+		many bit fields to extract into the same number of vector elements.
 
         \param repeat Number of bit fields to extract to each subsequent
         vector.
@@ -200,17 +235,26 @@ public:
     {
         BOOST_ASSERT(bits >= 0);
 
-        decltype(bits) bits_read = rdbuf()->sgetn(value, bits);
+        BOOST_AUTO(bits_read, rdbuf()->sgetn(value, bits));
         if (bits_read != bits)
         {
-            failbit();
-            eofbit();
+			// This read failed. Was it because there aren't enough available bits?
+			if (rdbuf()->in_avail() < bits)
+			{
+				eofbit();
+			}
+			failbit();
             m_gcount = 0;
             value = 0;
         }
         else
         {
-            m_gcount = bits_read;
+			// This read succeeded, but have we reached eof (without going past it)?
+			if (rdbuf()->in_avail() == 0)
+			{
+				eofbit();
+			}
+			m_gcount = bits_read;
         }
 
         m_gvalue = value;
@@ -236,6 +280,20 @@ public:
         return read(value, bits);
     }
 
+	/**
+		Put bit back.
+
+		\note Put bit back in stream so that it can be read.
+
+		\param[in] value Bit to put back in stream.
+		\return This bit stream.
+	*/
+	istream& putback(bitfield value)
+	{
+		// TBD
+		return *this;
+	}
+
     /**
         Set position of get pointer relative to indicated internal pointer.
 
@@ -245,11 +303,10 @@ public:
     */
     istream &seekg(std::streamoff offset, std::ios_base::seek_dir dir)
     {
-        if (rdbuf()->pubseekoff(offset, dir) ==
-            static_cast<std::streampos>(bitbuf::npos))
-        {
-            failbit();
-        }
+		if (eof() || rdbuf()->pubseekoff(offset, dir) == std::streampos(-1))
+		{
+			failbit();
+		}
 
         return *this;
     }
@@ -264,8 +321,7 @@ public:
     {
         BOOST_ASSERT(position >= 0);
 
-        if (rdbuf()->pubseekpos(position) ==
-            static_cast<std::streampos>(bitbuf::npos))
+        if (eof() || rdbuf()->pubseekpos(position) == std::streampos(-1))
         {
             failbit();
         }
@@ -302,8 +358,7 @@ public:
     {
         m_gcount = 0;
 
-        if (static_cast<decltype(bitbuf::eof)>(
-            rdbuf()->pubseekoff(-1, std::ios_base::cur)) == bitbuf::eof)
+        if (rdbuf()->pubseekoff(-1, std::ios_base::cur) == std::streampos(-1))
         {
             failbit();
         }
@@ -332,13 +387,75 @@ private:
         Friend const functions for access to badbit().
     */
     ///@{
-    template <typename T> friend istream &operator>>(istream &ibs,
-        const T &b);
-	// TBD - Also support vector<bool> >>/<< operators?
-    template <size_t N> friend istream &operator>>(istream &ibs,
+	template <size_t N> friend istream &operator>>(istream &ibs,
         const std::bitset<N> &bs);
-    friend istream &operator>>(istream &ibs, const bool &b);
+	friend istream &operator>>(istream &ibs, const bool &b);
     ///@}
+};
+
+/**
+	The value member of this class expresses whether the type has the member
+	function, identified by name and signature.
+
+	\param[in] traitsName Desired name for this new trait type.
+	\param[in] funcName Name of function member to look for.
+	\param[in] funcSig Signature of function member to look for.
+	\param[out] value Whether the function member is present in the class.
+*/
+#define DEFINE_HAS_SIGNATURE(traitsName, funcName, funcSig)                 \
+    template <typename U>                                                   \
+    class traitsName                                                        \
+    {                                                                       \
+        typedef boost::uint8_t yes; typedef boost::uint16_t no;             \
+        template<typename T, T> struct helper;                              \
+        template<typename T> static yes check(helper<funcSig, &funcName>*); \
+        template<typename T> static no check(...);                          \
+    public:                                                                 \
+        static const bool value = sizeof check<U>(0) == sizeof(yes);        \
+    }
+
+/**
+	The value member of the defined class expresses whether the type has the
+	member function, void resize(size_type).
+
+	\note This is the signature of resize() added in C++11.
+
+	\pre Type is a container class
+	(boost::spirit::traits::is_container<C>::value == true).
+
+	\param[out] value Whether resize() is present in the class.
+*/
+DEFINE_HAS_SIGNATURE(has_resize_1, T::resize, void (T::*)(typename T::size_type));
+
+/**
+	The value member of the defined class expresses whether the type has the
+	member function, void resize(size_type).
+
+	\note This is the signature of resize() that should be present in all STL
+	versions.
+
+	\pre Type is a container class
+	(boost::spirit::traits::is_container<C>::value == true).
+
+	\param[out] value Whether resize() is present in the class.
+*/
+DEFINE_HAS_SIGNATURE(has_resize_2, T::resize, void (T::*)(typename T::size_type, \
+	typename T::value_type));
+
+/**
+	Deterine whether this type has a resize function with at least one of two
+	of its signatures.
+
+	\pre Type is a container class
+	(boost::spirit::traits::is_container<C>::value == true).
+
+	\param[out] value Whether member function, resize(), is present in type.
+*/
+template <typename U>
+struct has_resize
+{
+	// Need to check both because the single-parameter signature was added in C++11.
+	static const bool value = has_resize_1<U>::value || has_resize_2<U>::value;
 };
 
 // Operator overloads /////////////////////////////////////////////////////////
@@ -352,7 +469,6 @@ private:
 */
 inline istream &operator>>(istream &ibs, bool &b)
 {
-    // Extract bit
     bitfield value;
     ibs.read(value, 1);
     b = value != 0;
@@ -369,12 +485,11 @@ inline istream &operator>>(istream &ibs, bool &b)
 */
 inline istream &operator>>(istream &ibs, const bool &b)
 {
-    // Extract bit; must be equal to b
-    bitfield value;
-    ibs.read(value, 1);
-    if (b != (value == 0 ? false : true))
+	BOOST_TYPEOF(b) value;
+	ibs >> value;
+	if (b != value)
     {
-        ibs.badbit();
+        ibs.failbit();
     }
 
     return ibs;
@@ -382,128 +497,177 @@ inline istream &operator>>(istream &ibs, const bool &b)
 
 // Templates //////////////////////////////////////////////////////////////////
 
-/**
-    Get bit field from input stream and place in integral.
-
-    \param[in,out] ibs Reference to istream on left-hand side of operator.
-    \param[out] b Integral on right-hand side of operator.
-    \return Reference to istream parameter.
-*/
-template <typename T>
-istream &operator>>(istream &ibs, T &b)
-{
-    bitfield value;
-    ibs.read(value, sizeof(T) * CHAR_BIT);
-    b = static_cast<T>(value);
-
-    return ibs;
-}
+// Templates for scalars //////////////////////////////////////////
 
 /**
-    Get bit field from input stream that must be equal to integral value.
+	Get bits from input stream and place in bitset.
 
-    \param[in,out] ibs Reference to istream on left-hand side of operator.
-    \param[in] b Integral on right-hand side of operator.
-    \return Reference to istream parameter.
-*/
-template <typename T>
-istream &operator>>(istream &ibs, const T &b)
-{
-    bitfield value;
-    ibs.read(value, sizeof(T) * CHAR_BIT);
-    if (b != value)
-    {
-        ibs.badbit();
-    }
-
-    return ibs;
-}
-
-/**
-    Get bit fields from input stream and place in integral vector.
-
-    \note Starting with the first element, this function populates existing
-    elements in the vector with bit fields sequentially extracted from the
-    input stream. It does not increase the size of the vector, e.g., with
-    push_back(), because it relies on the existing size of the vector to know
-    how many bit fields to extract.
-
-    \todo I thought this used m_repeat, not the size of the vector. Look into.
-
-    \param[in,out] ibs Reference to istream on left-hand side of operator.
-    \param[out] v Integral vector on right-hand side of operator.
-    \return Reference to istream parameter.
-*/
-template <typename T>
-istream &operator>>(istream &ibs, std::vector<T> &v)
-{
-    decltype(v.size()) vector_size = v.size();
-    for (decltype(vector_size) i = 0; i < vector_size; ++i) {
-        ibs >> v[i];
-    }
-
-    return ibs;
-}
-
-/**
-    Get bit fields from input stream that must be equal to elements in integral
-    vector.
-
-    \see Size note for non-const version of this function.
-
-    \todo I thought this used m_repeat, not the size of the vector. Look into.
-
-    \param[in,out] ibs Reference to istream on left-hand side of operator.
-    \param[in] v Integral vector on right-hand side of operator.
-    \return Reference to istream parameter.
-*/
-template <typename T>
-istream &operator>>(istream &ibs, std::vector<const T> &v)
-{
-    decltype(v.size()) vectorSize = v.size();
-    for (decltype(vectorSize) i = 0; i < vectorSize; ++i) {
-        ibs >> v[i];
-    }
-
-    return ibs;
-}
-
-/**
-    Get bits from input stream and place in bitset.
-
-    \param[in,out] ibs Reference to istream on left-hand side of operator.
-    \param[out] bs bitset on right-hand side of operator.
-    \return Reference to istream parameter.
+	\param[in,out] ibs Reference to istream on left-hand side of operator.
+	\param[out] bs bitset on right-hand side of operator.
+	\return Reference to istream parameter.
 */
 template <size_t N>
 istream &operator>>(istream &ibs, std::bitset<N> &bs)
 {
-    decltype(bs.to_ulong()) value;
-    ibs.read(value, N);
-    bs = static_cast<long>(value);
-    BOOST_ASSERT(bs.to_ulong() == value);
+	bitfield value;
+	ibs.read(value, N);
+	bs = value;
 
-    return ibs;
+	return ibs;
 }
 
 /**
-    Get bits from input stream that must be equal to bitset value.
+	Get bits from input stream that must be equal to bitset value.
 
-    \param[in,out] ibs Reference to istream on left-hand side of operator.
-    \param[in] bs bitset on right-hand side of operator.
-    \return Reference to istream parameter.
+	\param[in,out] ibs Reference to istream on left-hand side of operator.
+	\param[in] bs bitset on right-hand side of operator.
+	\return Reference to istream parameter.
 */
 template <size_t N>
 istream &operator>>(istream &ibs, const std::bitset<N> &bs)
 {
-    decltype(bs.to_ulong()) value;
-    ibs.read(value, N);
-    if (bs.to_ulong() != value)
-    {
-        ibs.badbit();
-    }
+	BOOST_TYPEOF(bs) value;
+	ibs >> value;
+	if (bs != value)
+	{
+		ibs.failbit();
+	}
 
-    return ibs;
+	return ibs;
+}
+
+/**
+	Get bit field from input stream and place in integral.
+
+	\param[in,out] ibs Reference to istream on left-hand side of operator.
+	\param[out] b Integral on right-hand side of operator.
+	\return Reference to istream parameter.
+*/
+template <typename T>
+typename boost::enable_if_c<
+	!boost::spirit::traits::is_container<T>::value,
+	istream &>::type
+	operator>>(istream &ibs, T &b)
+{
+	bitfield value;
+	ibs.read(value, sizeof b * std::numeric_limits<unsigned char>::digits);
+	b = static_cast<T>(value);
+
+	return ibs;
+}
+
+/**
+	Get bit field from input stream that must be equal to integral value.
+
+	\param[in,out] ibs Reference to istream on left-hand side of operator.
+	\param[in] b Integral on right-hand side of operator.
+	\return Reference to istream parameter.
+*/
+template <typename T>
+typename boost::enable_if_c<
+	!boost::spirit::traits::is_container<T>::value,
+	istream &>::type
+	operator>>(istream &ibs, const T &b)
+{
+	BOOST_TYPEOF(b) value;
+	ibs >> value;
+	if (b != value)
+	{
+		ibs.failbit();
+	}
+
+	return ibs;
+}
+
+// Templates for sequence containers //////////////////////////////////////////
+
+/**
+	Get bit fields from input stream that must be equal to elements in
+	container.
+
+	\see Unlike the non-const version of this operator overload,
+	istream::repeat() does not affect this overload. The container must already
+	be sized and populated with the values it requires.
+
+	\param[in,out] ibs Reference to istream on left-hand side of operator.
+	\param[in] v Container on right-hand side of operator.
+	\return Reference to istream parameter.
+*/
+template <typename C>
+typename boost::enable_if_c<
+	boost::spirit::traits::is_container<C>::value,
+	istream &
+>::type
+operator>>(istream &ibs, const C &c)
+{
+	for (BOOST_AUTO_TPL(it, c.begin()); it != c.end(); ++it)
+	{
+		ibs >> *it;
+	}
+
+	return ibs;
+}
+
+// Templates for variable-size sequence containers ////////////////////////////
+
+/**
+	Get bit fields from input stream and place in container.
+
+	\note If istream::repeat() returns 0, repetitive extraction occurs based on
+	container size. Otherwise, this many bit fields are added to the container,
+	making the container the same size as the repeat value.
+
+	\param[in,out] ibs Reference to istream on left-hand side of operator.
+	\param[out] v Container on right-hand side of operator.
+	\return Reference to istream parameter.
+*/
+template <typename C>
+typename boost::enable_if_c<
+	boost::spirit::traits::is_container<C>::value && has_resize<C>::value,
+	istream &
+>::type
+operator>>(istream &ibs, C &c)
+{
+	c.resize(ibs.repeat() == 0 ? c.size() : ibs.repeat());
+	for (BOOST_AUTO_TPL(it, c.begin()); it != c.end(); ++it)
+	{
+		// (This is a workaround specifcally for std::vector<bool>. Otherwise,
+		// I'd extract directly into the dereferenced iterator, i.e.,
+		// ibs >> *it.)
+		C::value_type v;
+		ibs >> v;
+		*it = v;
+	}
+
+	return ibs;
+}
+
+// Templates for fixed-size sequence containers ///////////////////////////////
+
+/**
+	Get bit fields from input stream and place in container.
+
+	\note If istream::repeat() returns 0, repetitive extraction occurs based on
+	container size. Otherwise, this many bit fields are added to the container,
+	making the container the same size as the repeat value.
+
+	\param[in,out] ibs Reference to istream on left-hand side of operator.
+	\param[out] v Container on right-hand side of operator.
+	\return Reference to istream parameter.
+*/
+template <typename C>
+typename boost::enable_if_c<
+	boost::spirit::traits::is_container<C>::value && !has_resize<C>::value,
+	istream &
+>::type
+operator>>(istream &ibs, C &c)
+{
+	for (BOOST_AUTO_TPL(it, c.begin()); it != c.end(); ++it)
+	{
+		ibs >> *it;
+	}
+
+	return ibs;
 }
 
 } // namespace bitstream

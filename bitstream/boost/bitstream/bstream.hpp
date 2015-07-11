@@ -15,15 +15,12 @@
 // Includes ///////////////////////////////////////////////////////////////////
 
 #include <bitset>
-#include <vector>
-#include <cassert>
 #include <boost/typeof/typeof.hpp>
-#include <boost/assert.hpp>
 #include <boost/bitstream/istream.hpp>
 #include <boost/bitstream/ostream.hpp>
 
-// This code uses decltype, which is defined in terms of BOOST's type_of. BOOST
-// only knows about C++'s core types, so we have to tell it about streampos.
+// This code uses BOOST_TYPEOF(). BOOST only knows about C++'s core types, so
+// we have to tell it about streampos.
 #include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
 BOOST_TYPEOF_REGISTER_TYPE(std::streampos)
 
@@ -50,6 +47,9 @@ public:
     /**
         Constructor.
 
+		\note The assumption is that a buffer will be provided later via
+		data(char *buffer, std::streamsize size).
+
         \param[in] which Open mode.
     */
     explicit ibitstream(std::ios_base::openmode which = std::ios_base::in) :
@@ -67,15 +67,16 @@ public:
         Constructor.
 
         \param[in] buffer Pointer to char array to be accessed.
-        \param[in] size Number of accessible bits in char array.
+        \param[in] size_ Number of accessible bits in char array.
         \param[in] which Open mode.
     */
-    explicit ibitstream(const char *buffer, std::streamsize size = INT_MAX,
+    explicit ibitstream(const char *buffer,
+		std::streamsize size_ = (std::numeric_limits<std::streamsize>::max)(),
         std::ios_base::openmode which = std::ios_base::in) :
-        m_bitbuf(buffer, size, which), istream(&m_bitbuf)
+        m_bitbuf(buffer, size_, which), istream(&m_bitbuf)
     {
         BOOST_ASSERT(buffer != NULL);
-        BOOST_ASSERT(size >= 0);
+        BOOST_ASSERT(size_ >= 0);
         // Append to input? Huh?
         BOOST_ASSERT((which & std::ios_base::app) == 0);
         // Input at end of stream? Huh?
@@ -91,7 +92,7 @@ public:
     */
     bitbuf *rdbuf() const
     {
-        return const_cast<bitbuf *>(&m_bitbuf);
+        return const_cast<BOOST_TYPEOF(rdbuf())>(&m_bitbuf);
     }
 
     /**
@@ -101,13 +102,24 @@ public:
 
         \return Pointer to stream buffer.
     */
-	// TBD - Need to also return size somehow, but what if begin bit position
-	// is not 0, e.g., for iobitstream/bitstream class? Need (bit) size() and
-	// begin bit position accessors? 
     const char *data() const
     {
         return iob::rdbuf()->data();
     }
+
+	/**
+		Set contents of the stream.
+
+		\note This is analogous to istreagstream::str(const string &s).
+
+		\param[in] buffer Pointer to new char array to be accessed.
+		\param[in] size_ Number of accessible bits in new char array.
+		*/
+	void data(char *buffer,
+		std::streamsize size_ = (std::numeric_limits<BOOST_TYPEOF(size_)>::max)())
+	{
+		m_bitbuf.data(buffer, size_);
+	}
 
 private:
     /**
@@ -131,13 +143,14 @@ public:
     /**
         Constructor.
 
+		\note The assumption is that a buffer will be provided later via
+		data(char *buffer, std::streamsize size).
+
         \param[in] which Open mode.
     */
     explicit obitstream(std::ios_base::openmode which = std::ios_base::out) :
         m_bitbuf(which), ostream(&m_bitbuf)
     {
-        // TBD
-
         // Append to input? Huh?
         BOOST_ASSERT((which & std::ios_base::app) == 0);
         // Input at end of stream? Huh?
@@ -150,17 +163,16 @@ public:
         Constructor.
 
         \param[in] buffer Pointer to char array to be accessed.
-        \param[in] size Number of accessible bits in char array.
+        \param[in] size_ Number of accessible bits in char array.
         \param[in] which Open mode.
     */
-    explicit obitstream(const char *buffer, std::streamsize size = INT_MAX,
+    explicit obitstream(const char *buffer,
+		std::streamsize size_ = (std::numeric_limits<std::streamsize>::max)(),
         std::ios_base::openmode which = std::ios_base::out) :
-        m_bitbuf(buffer, size, which), ostream(&m_bitbuf)
+        m_bitbuf(buffer, size_, which), ostream(&m_bitbuf)
     {
-        // TBD
-
         BOOST_ASSERT(buffer != NULL);
-        BOOST_ASSERT(size >= 0);
+        BOOST_ASSERT(size_ >= 0);
         // Append to input? Huh?
         BOOST_ASSERT((which & std::ios_base::app) == 0);
         // Input at end of stream? Huh?
@@ -170,27 +182,30 @@ public:
     }
 
     /**
-        Get the bitbuf object associated with the stream upon construction.
-
-        \return A pointer to the bitbuf object associated with the stream.
-    */
-    bitbuf *rdbuf() const
-    {
-        return const_cast<bitbuf *>(&m_bitbuf);
-    }
-
-    /**
         Get pointer to current contents of the stream.
 
         \note This is analogous to ostringstream::str().
 
         \return Pointer to stream buffer.
     */
-	// TBD - How does the user know how long the buffer is? Maybe just return as std::string().
     const char *data() const
     {
         return iob::rdbuf()->data();
     }
+
+	/**
+		Set contents of the stream.
+
+		\note This is analogous to ostringstream::str(const string &s).
+
+		\param[in] buffer Pointer to new char array to be accessed.
+		\param[in] size_ Number of accessible bits in new char array.
+	*/
+	void data(char *buffer,
+		std::streamsize size_ = (std::numeric_limits<BOOST_TYPEOF(size_)>::max)())
+	{
+		m_bitbuf.data(buffer, size_);
+	}
 
 private:
     /**
