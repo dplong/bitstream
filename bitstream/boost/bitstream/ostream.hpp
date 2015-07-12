@@ -132,7 +132,7 @@ public:
     */
     ostream &seekp(std::streamoff offset, std::ios_base::seek_dir dir)
     {
-		if (!fail() && rdbuf()->pubseekoff(offset, dir) == std::streampos(-1))
+		if (!fail() && rdbuf()->pubseekoff(offset, dir, std::ios_base::out) == std::streampos(-1))
 		{
 			failbit();
 		}
@@ -255,8 +255,7 @@ typename boost::enable_if_c<
 >::type
 operator<<(ostream &obs, const T &b)
 {
-	return obs.write(static_cast<bitfield>(b),
-		sizeof(T) * std::numeric_limits<unsigned char>::digits);
+	return obs.write(static_cast<bitfield>(b), sizeof(T) * CHAR_BIT);
 }
 
 // Templates for sequence containers //////////////////////////////////////////

@@ -113,7 +113,7 @@ public:
 	*/
 	istream &get(bitbuf &bb)
 	{
-		// TBD
+		// TBD Implement get().
 		return *this;
 	}
 
@@ -125,9 +125,8 @@ public:
     */
     istream &ignore(std::streamsize bits = 1)
     {
-        BOOST_ASSERT(bits >= 0);
-
-        if (rdbuf()->pubseekoff(bits, std::ios_base::cur) == std::streampos(-1))
+		// TBD Need to find a way to ignore either input or output stream.
+        if (rdbuf()->pubseekoff(bits, std::ios_base::cur, std::ios_base::in) == std::streampos(-1))
         {
             eofbit();
             m_gcount = 0;
@@ -290,7 +289,7 @@ public:
 	*/
 	istream& putback(bitfield value)
 	{
-		// TBD
+		// TBD Implement putback().
 		return *this;
 	}
 
@@ -303,7 +302,7 @@ public:
     */
     istream &seekg(std::streamoff offset, std::ios_base::seek_dir dir)
     {
-		if (eof() || rdbuf()->pubseekoff(offset, dir) == std::streampos(-1))
+		if (eof() || rdbuf()->pubseekoff(offset, dir, std::ios_base::in) == std::streampos(-1))
 		{
 			failbit();
 		}
@@ -319,9 +318,7 @@ public:
     */
     istream &seekg(std::streampos position)
     {
-        BOOST_ASSERT(position >= 0);
-
-        if (eof() || rdbuf()->pubseekpos(position) == std::streampos(-1))
+        if (eof() || rdbuf()->pubseekpos(position, std::ios_base::in) == std::streampos(-1))
         {
             failbit();
         }
@@ -346,7 +343,7 @@ public:
     */
     std::streampos tellg()
     {
-        return rdbuf()->pubseekoff(0, std::ios_base::cur);
+        return rdbuf()->pubseekoff(0, std::ios_base::cur, std::ios_base::in);
     }
 
     /**
@@ -358,7 +355,7 @@ public:
     {
         m_gcount = 0;
 
-        if (rdbuf()->pubseekoff(-1, std::ios_base::cur) == std::streampos(-1))
+        if (rdbuf()->pubseekoff(-1, std::ios_base::cur, std::ios_base::in) == std::streampos(-1))
         {
             failbit();
         }
@@ -550,7 +547,7 @@ typename boost::enable_if_c<
 	operator>>(istream &ibs, T &b)
 {
 	bitfield value;
-	ibs.read(value, sizeof b * std::numeric_limits<unsigned char>::digits);
+	ibs.read(value, sizeof b * CHAR_BIT);
 	b = static_cast<T>(value);
 
 	return ibs;

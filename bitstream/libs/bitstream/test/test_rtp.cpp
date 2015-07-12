@@ -47,8 +47,7 @@ BOOST_AUTO_TEST_CASE(rtp)
 
 	{
 		Rtp rtp;
-		boost::bitstream::ibitstream bin(rtpHeader,
-			sizeof rtpHeader * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(rtpHeader, sizeof rtpHeader * CHAR_BIT);
 
 		std::bitset<4> csrcCount;
 		boost::uint16_t extensionLength = 0;
@@ -83,8 +82,7 @@ BOOST_AUTO_TEST_CASE(rtp)
 
 	{
 		Rtp rtp;
-		boost::bitstream::ibitstream bin(rtpHeader,
-			sizeof rtpHeader * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(rtpHeader, sizeof rtpHeader * CHAR_BIT);
 
 		std::bitset<4> csrcCount;
 		boost::uint16_t extensionLength = 0;
@@ -112,11 +110,14 @@ BOOST_AUTO_TEST_CASE(rtp)
 
 		{
 			char buffer[1000];
-			boost::bitstream::obitstream bout(buffer, sizeof buffer);
+			boost::bitstream::obitstream bout(buffer, sizeof buffer * CHAR_BIT);
 
-			bout << rtp.version << rtp.padding << rtp.extension.present
-				<< std::bitset<4>(rtp.csrcIdentifier.size()) << rtp.marker
-				<< rtp.payloadType << rtp.sequenceNumber << rtp.timestamp
+			bout << rtp.version;
+			bout << rtp.padding;
+			bout << rtp.extension.present;
+			bout << std::bitset<4>(rtp.csrcIdentifier.size());
+			bout << rtp.marker;
+			bout << rtp.payloadType << rtp.sequenceNumber << rtp.timestamp
 				<< rtp.ssrcIdentifier << rtp.csrcIdentifier;
 			if (rtp.extension.present) {
 				bout << rtp.extension.identifier
@@ -162,8 +163,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	// Underrun of const vector<bool>. Read 10 of 16 bits.
 	{
 		char buffer[] = { '\xb7', '\x40' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> cvb;
 		BOOST_CHECK(bin);
 	}
@@ -171,8 +171,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	// Overrun of const vector<bool>. Attempt to read 10 of 8 bits.
 	{
 		const char buffer[] = { '\xb7' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> cvb;
 		BOOST_CHECK(!bin);
 		BOOST_CHECK(!bin.bad());
@@ -184,8 +183,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	{
 		std::vector<bool> vb(16);
 		char buffer[] = { '\xb7', '\x40' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> vb;
 		BOOST_CHECK(bin);
 		BOOST_CHECK(!bin.bad());
@@ -214,8 +212,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	{
 		std::vector<bool> vb;
 		char buffer[] = { '\xb7', '\x40' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> boost::bitstream::setrepeat(16) >> vb;
 		BOOST_CHECK(bin);
 		BOOST_CHECK(!bin.bad());
@@ -245,8 +242,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	{
 		std::vector<boost::uint16_t> vu;
 		char buffer[] = { '\x12', '\x34', '\x56', '\x78', '\x9a', '\xbc', '\xde', '\xf0' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> boost::bitstream::setrepeat(4);
 		bin >> vu;
 		BOOST_CHECK(bin);
@@ -265,8 +261,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	{
 		std::vector<boost::uint16_t> vu;
 		char buffer[] = { '\x12', '\x34', '\x56', '\x78', '\x9a', '\xbc', '\xde', '\xf0', '\x12' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> boost::bitstream::setrepeat(4) >> vu;
 		BOOST_CHECK(bin);
 		BOOST_CHECK(!bin.bad());
@@ -284,8 +279,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	{
 		std::vector<boost::uint16_t> vu;
 		char buffer[] = { '\x12', '\x34', '\x56', '\x78', '\x9a', '\xbc', '\xde', '\xf0' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> boost::bitstream::setrepeat(5) >> vu;
 		BOOST_CHECK(!bin);
 		BOOST_CHECK(!bin.bad());
@@ -303,8 +297,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	{
 		std::vector<boost::uint16_t> vu;
 		char buffer[] = { '\x12', '\x34', '\x56', '\x78', '\x9a', '\xbc', '\xde', '\xf0', '\x12' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> boost::bitstream::setrepeat(5) >> vu;
 		BOOST_CHECK(!bin);
 		BOOST_CHECK(!bin.bad());
@@ -322,8 +315,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	{
 		std::vector<boost::uint16_t> vu(4);
 		char buffer[] = { '\x12', '\x34', '\x56', '\x78', '\x9a', '\xbc', '\xde', '\xf0' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> vu;
 		BOOST_CHECK(bin);
 		BOOST_CHECK(!bin.bad());
@@ -341,8 +333,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	{
 		std::vector<boost::uint16_t> vu(4);
 		char buffer[] = { '\x12', '\x34', '\x56', '\x78', '\x9a', '\xbc', '\xde', '\xf0', '\x12' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> vu;
 		BOOST_CHECK(bin);
 		BOOST_CHECK(!bin.bad());
@@ -360,8 +351,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	{
 		std::vector<boost::uint16_t> vu(5);
 		char buffer[] = { '\x12', '\x34', '\x56', '\x78', '\x9a', '\xbc', '\xde', '\xf0' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> vu;
 		BOOST_CHECK(!bin);
 		BOOST_CHECK(!bin.bad());
@@ -379,8 +369,7 @@ BOOST_AUTO_TEST_CASE(vector)
 	{
 		std::vector<boost::uint16_t> vu(5);
 		char buffer[] = { '\x12', '\x34', '\x56', '\x78', '\x9a', '\xbc', '\xde', '\xf0', '\x12' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> vu;
 		BOOST_CHECK(!bin);
 		BOOST_CHECK(!bin.bad());
@@ -403,8 +392,7 @@ BOOST_AUTO_TEST_CASE(list)
 	// Underrun. Read 10 of 16 bits.
 	{
 		const char buffer[] = { '\xb7', '\x40' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> lb;
 		BOOST_CHECK(bin);
 	}
@@ -412,8 +400,7 @@ BOOST_AUTO_TEST_CASE(list)
 	// Overrun. Attempt to read 10 of 8 bits.
 	{
 		const char buffer[] = { '\xb7' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> lb;
 		BOOST_CHECK(!bin);
 		BOOST_CHECK(!bin.bad());
@@ -431,8 +418,7 @@ BOOST_AUTO_TEST_CASE(deque)
 	// Underrun. Read 10 of 16 bits.
 	{
 		const char buffer[] = { '\xb7', '\x40' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> db;
 		BOOST_CHECK(bin);
 	}
@@ -440,8 +426,7 @@ BOOST_AUTO_TEST_CASE(deque)
 	// Overrun. Attempt to read 10 of 8 bits.
 	{
 		const char buffer[] = { '\xb7' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> db;
 		BOOST_CHECK(!bin);
 		BOOST_CHECK(!bin.bad());
@@ -484,8 +469,7 @@ BOOST_AUTO_TEST_CASE(array)
 	// Underrun. Read 10 of 16 bits.
 	{
 		const char buffer[] = { '\xb7', '\x40' };
-		boost::bitstream::ibitstream bin(buffer, sizeof
-			buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> ab;
 		BOOST_CHECK(bin);
 	}
@@ -493,8 +477,7 @@ BOOST_AUTO_TEST_CASE(array)
 	// Overrun. Attempt to read 10 of 8 bits.
 	{
 		const char buffer[] = { '\xb7' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> ab;
 		BOOST_CHECK(!bin);
 		BOOST_CHECK(!bin.bad());
@@ -506,8 +489,7 @@ BOOST_AUTO_TEST_CASE(array)
 	{
 		std::array<bool, 16> vb;
 		char buffer[] = { '\xb7', '\x40' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> vb;
 		BOOST_CHECK(bin);
 		BOOST_CHECK(!bin.bad());
@@ -569,8 +551,7 @@ BOOST_AUTO_TEST_CASE(forward_list)
 	// Underrun. Read 10 of 16 bits.
 	{
 		const char buffer[] = { '\xb7', '\x40' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> flb;
 		BOOST_CHECK(bin);
 	}
@@ -578,8 +559,7 @@ BOOST_AUTO_TEST_CASE(forward_list)
 	// Overrun. Attempt to read 10 of 8 bits.
 	{
 		const char buffer[] = { '\xb7' };
-		boost::bitstream::ibitstream bin(buffer,
-			sizeof buffer * std::numeric_limits<unsigned char>::digits);
+		boost::bitstream::ibitstream bin(buffer, sizeof buffer * CHAR_BIT);
 		bin >> flb;
 		BOOST_CHECK(!bin);
 		BOOST_CHECK(!bin.bad());

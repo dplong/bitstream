@@ -168,7 +168,7 @@ inline istream &operator>>(istream &ibs, ignore skip)
     \code
     // Advance get pointer to next word.
     bitset<16> sequenceNumber;
-    ibitstream(rtpHeader).aligng(sizeof(WORD) * std::numeric_limits<unsigned char>::digits) >> sequenceNumber;
+    ibitstream(rtpHeader).aligng(sizeof(WORD) * CHAR_BIT) >> sequenceNumber;
     \endcode
 
     \code
