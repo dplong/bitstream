@@ -55,12 +55,6 @@ public:
     explicit ibitstream(std::ios_base::openmode which = std::ios_base::in) :
         m_bitbuf(which), istream(&m_bitbuf)
     {
-        // Append to input? Huh?
-        BOOST_ASSERT((which & std::ios_base::app) == 0);
-        // Input at end of stream? Huh?
-        BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Truncate not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     /**
@@ -70,19 +64,10 @@ public:
         \param[in] size_ Number of accessible bits in char array.
         \param[in] which Open mode.
     */
-    explicit ibitstream(const char *buffer,
-		std::streamsize size_ = (std::numeric_limits<std::streamsize>::max)(),
+    explicit ibitstream(const char *buffer, std::streamsize size_,
         std::ios_base::openmode which = std::ios_base::in) :
         m_bitbuf(buffer, size_, which), istream(&m_bitbuf)
     {
-        BOOST_ASSERT(buffer != NULL);
-        BOOST_ASSERT(size_ >= 0);
-        // Append to input? Huh?
-        BOOST_ASSERT((which & std::ios_base::app) == 0);
-        // Input at end of stream? Huh?
-        BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Truncate not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     /**
@@ -115,8 +100,7 @@ public:
 		\param[in] buffer Pointer to new char array to be accessed.
 		\param[in] size_ Number of accessible bits in new char array.
 		*/
-	void data(char *buffer,
-		std::streamsize size_ = (std::numeric_limits<BOOST_TYPEOF(size_)>::max)())
+	void data(char *buffer, std::streamsize size_)
 	{
 		m_bitbuf.data(buffer, size_);
 	}
@@ -151,12 +135,6 @@ public:
     explicit obitstream(std::ios_base::openmode which = std::ios_base::out) :
         m_bitbuf(which), ostream(&m_bitbuf)
     {
-        // Append to input? Huh?
-        BOOST_ASSERT((which & std::ios_base::app) == 0);
-        // Input at end of stream? Huh?
-        BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Truncate not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     /**
@@ -166,19 +144,10 @@ public:
         \param[in] size_ Number of accessible bits in char array.
         \param[in] which Open mode.
     */
-    explicit obitstream(const char *buffer,
-		std::streamsize size_ = (std::numeric_limits<std::streamsize>::max)(),
+    explicit obitstream(const char *buffer, std::streamsize size_,
         std::ios_base::openmode which = std::ios_base::out) :
         m_bitbuf(buffer, size_, which), ostream(&m_bitbuf)
     {
-        BOOST_ASSERT(buffer != NULL);
-        BOOST_ASSERT(size_ >= 0);
-        // Append to input? Huh?
-        BOOST_ASSERT((which & std::ios_base::app) == 0);
-        // Input at end of stream? Huh?
-        BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Truncate not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
     }
 
     /**
@@ -201,8 +170,7 @@ public:
 		\param[in] buffer Pointer to new char array to be accessed.
 		\param[in] size_ Number of accessible bits in new char array.
 	*/
-	void data(char *buffer,
-		std::streamsize size_ = (std::numeric_limits<BOOST_TYPEOF(size_)>::max)())
+	void data(char *buffer, std::streamsize size_)
 	{
 		m_bitbuf.data(buffer, size_);
 	}

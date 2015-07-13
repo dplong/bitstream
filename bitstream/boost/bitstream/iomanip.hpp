@@ -126,6 +126,17 @@ public:
         return ibs.ignore(m_bits);
     }
 
+	/**
+		Overload for the () operator on this class.
+
+		\param[in,out] obs Reference to ostream on lhs of >> operator.
+		\return Reference to ostream parameter.
+	*/
+	ostream &operator()(ostream &obs) const
+	{
+		return obs.ignore(m_bits);
+	}
+
 private:
     /**
         Number of bit fields to ignore in bit stream.
@@ -143,6 +154,18 @@ private:
 inline istream &operator>>(istream &ibs, ignore skip)
 {
     return skip(ibs);
+}
+
+/**
+	Manipulator for ostream that ignores bits.
+
+	\param[in,out] obs Reference to ostream on left-hand side of operator.
+	\param[in] repeat Instance of ignore class.
+	\return Reference to ostream parameter.
+*/
+inline ostream &operator>>(ostream &obs, ignore skip)
+{
+	return skip(obs);
 }
 ///@}
 
@@ -193,7 +216,6 @@ public:
     */
     aligng(size_t bits) : m_bits(bits)
     {
-        BOOST_ASSERT(bits > 0);
     }
 
     /**

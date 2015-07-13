@@ -61,6 +61,22 @@ public:
         return *this;
     }
 
+	/**
+		Ignore, or skip over, bits in stream.
+
+		\param[in] bits Number of bits to ignore.
+		\return This bit stream.
+	*/
+	ostream &ignore(std::streamsize bits = 1)
+	{
+		if (rdbuf()->pubseekoff(bits, std::ios_base::cur, std::ios_base::out) == std::streampos(-1))
+		{
+			eofbit();
+		}
+
+		return *this;
+	}
+
     /**
         Align put pointer to next bit multiple if not already at one.
 

@@ -44,61 +44,35 @@ typedef uintmax_t bitfield;
 class bitbuf
 {
 public:
-    /**
-        Constructor.
+	/**
+		Constructor.
 
-        \param[in] which Open mode.
-    */
-    explicit bitbuf(std::ios_base::openmode which =
-        std::ios_base::in | std::ios_base::out) : m_buffer(NULL), m_gptr(0),
-		m_egptr((std::numeric_limits<BOOST_TYPEOF(m_egptr)>::max)()),
-		m_eback(0), m_pptr(0),
-		m_epptr((std::numeric_limits<BOOST_TYPEOF(m_epptr)>::max)()),
-		m_pbase(0)
-    {
-        // TBD Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::app) == 0);
-        // TBD Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // TBD Truncate not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
-    }
+		\param[in] which Open mode.
+	*/
+	explicit bitbuf(std::ios_base::openmode which =
+		std::ios_base::in | std::ios_base::out) : m_buffer(NULL),
+		m_eback(0), m_gptr(0), m_egptr(0),
+		m_pbase(0), m_pptr(0), m_epptr(0)
+	{
+		// TBD Output not support, so can't append.
+		// TBD Output not support, so can't append each time.
+		// TBD Truncate not currently supported.
+	}
 
-    /**
+	/**
         Constructor.
 
         \param[in] buffer Pointer to char array to be accessed.
         \param[in] which Open mode.
         \param[in] size_ Number of accessible bits in char array.
     */
-    bitbuf(const char *buffer,
-		std::streamsize size_ = (std::numeric_limits<std::streamsize>::max)(),
-        std::ios_base::openmode which =
-        std::ios_base::in | std::ios_base::out) :
-        m_buffer(reinterpret_cast<unsigned char *>(const_cast<char *>(
-        buffer)))
-    {
-		if ((which & std::ios_base::in) != 0)
-		{
-			m_gptr = 0;
-			m_egptr = size_;
-			m_eback = 0;
-		}
-
-		if ((which & std::ios_base::out) != 0)
-		{
-			m_pptr = 0;
-			m_epptr = size_;
-			m_pbase = 0;
-		}
-
-        // Output not support, so can't append.
-        BOOST_ASSERT((which & std::ios_base::app) == 0);
-        // Output not support, so can't append each time.
-        BOOST_ASSERT((which & std::ios_base::ate) == 0);
-        // Truncate not currently supported.
-        BOOST_ASSERT((which & std::ios_base::trunc) == 0);
-    }
+    bitbuf(const char *buffer, std::streamsize size_,
+        std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) :
+        m_buffer(reinterpret_cast<unsigned char *>(const_cast<char *>(buffer))),
+		m_eback(0), m_gptr(0), m_egptr(size_),
+		m_pbase(0), m_pptr(0), m_epptr(size_)
+	{
+	}
 
     /**
         Get pointer to char-array stream buffer.
@@ -136,16 +110,6 @@ public:
     void data(char *buffer, std::streamsize size)
     {
 		setbuf(reinterpret_cast<unsigned char *>(buffer), size);
-    }
-
-    /**
-        Number of bits currently available to read.
-
-        \return Number of readable bits.
-    */
-    std::streamsize in_avail() const
-    {
-        return egptr() - gptr();
     }
 
     /**
@@ -198,6 +162,18 @@ public:
         return sync();
     }
 
+	// Input functions ////////////////////////////////////////////////////////
+
+	/**
+		Number of bits currently available to read.
+
+		\return Number of readable bits.
+	*/
+	std::streamsize in_avail() const
+	{
+		return egptr() - gptr();
+	}
+
     /**
         Get current bit and advance get pointer.
 
@@ -215,16 +191,29 @@ public:
 		\param[out] value Current bit.
 		\return Whether okay (eof has not been encountered).
 	*/
-	bool sgetb(bitfield &value)
+	bool sgetb(bitfield &b)
 	{
-		bool okay = sbumpb(value);
+		// Note: This is an optimization of "return sgetn(bitfield, 1) == 1;"
 
-		if (!okay)
+		bool get_succeeded = true;
+
+		if (gptr() == std::streampos(-1) || gptr() == egptr())
 		{
-			pubseekoff(-1, std::ios_base::cur, std::ios_base::in);
+			get_succeeded = underflow(b);
+		}
+		else
+		{
+			const size_t intra_byte_bit_offset = gptr() % CHAR_BIT;
+			const size_t shift_amount = (CHAR_BIT - ((1 + intra_byte_bit_offset) % CHAR_BIT)) % CHAR_BIT;
+			const unsigned char mask = 1 << shift_amount;
+			b = (*current_get_byte() & mask) >> shift_amount;
+
+			gbump(1);
+
+			get_succeeded = true;
 		}
 
-		return okay;
+		return get_succeeded = true;;
 	}
 
     /**
@@ -276,56 +265,13 @@ public:
 	}
 
 	/**
-		Put bit at put pointer.
+		Move get pointer backwards and return bit at new position.
 
-		\param[out] b Current bit.
+		\param[out] value Bit before position prior to call.
 		\return Whether okay (eof has not been encountered).
 	*/
-	bool sputb(bitfield b)
+	bool sungetb(bitfield &b)
 	{
-		bool put_succeeded = true;
-
-		if (pptr() == std::streampos(-1) || pptr() == epptr())
-		{
-			put_succeeded = overflow(b);
-		}
-		else
-		{
-			const size_t intra_byte_bit_offset = m_pptr % CHAR_BIT;
-			const size_t shift_amount = (CHAR_BIT - ((1 + intra_byte_bit_offset) % CHAR_BIT)) % CHAR_BIT;
-			const bitfield mask = ~(1 << shift_amount);
-
-			unsigned char * const byte_pointer = current_put_byte();
-			const unsigned char destination_with_cleared_bits = *byte_pointer & mask;
-			const unsigned char source_with_shifted_bits = (b & 1) << shift_amount;
-			*byte_pointer = destination_with_cleared_bits | source_with_shifted_bits;
-
-			pbump(1);
-		}
-
-		return put_succeeded;
-	}
-
-	/**
-		Put sequence of bits.
-
-		\param[out] value Value of bit field.
-		\param[in] size Number of bits in sequence of bits.
-		\return Number of bits written to buffer or zero if error or eof.
-	*/
-	std::streamsize sputn(bitfield &value, std::streamsize size)
-	{
-		return xsputn(value, size);
-	}
-
-    /**
-        Move get pointer backwards and return bit at new position.
-
-        \param[out] value Bit before position prior to call.
-        \return Whether okay (eof has not been encountered).
-    */
-    bool sungetb(bitfield &b)
-    {
 		bool unget_succeeded;
 
 		if (gptr() == std::streampos(-1) || gptr() == eback())
@@ -340,10 +286,54 @@ public:
 		}
 
 		return unget_succeeded;
-    }
+	}
+
+	// Output functions ///////////////////////////////////////////////////////
+
+	/**
+		Put bit at put pointer.
+
+		\param[out] b Current bit.
+		\return Whether okay (eof has not been encountered).
+	*/
+	bool sputb(bitfield b)
+	{
+		// Note: This is an optimization of "return sputn(bitfield, 1) == 1;"
+
+		bool put_succeeded = true;
+
+		if (pptr() == std::streampos(-1) || pptr() == epptr())
+		{
+			put_succeeded = overflow(b);
+		}
+		else
+		{
+			const size_t intra_byte_bit_offset = pptr() % CHAR_BIT;
+			const size_t shift_amount = (CHAR_BIT - ((1 + intra_byte_bit_offset) % CHAR_BIT)) % CHAR_BIT;
+			const unsigned char mask = ~(1 << shift_amount);
+			unsigned char * const byte_pointer = current_put_byte();
+			*byte_pointer = *byte_pointer & mask | (b & 1) << shift_amount;
+
+			pbump(1);
+		}
+
+		return put_succeeded;
+	}
+
+	/**
+		Put sequence of bits.
+
+		\param[in] value Value of bit field.
+		\param[in] size Number of bits in sequence of bits.
+		\return Number of bits written to buffer or zero if error or eof.
+	*/
+	std::streamsize sputn(bitfield value, std::streamsize size)
+	{
+		return xsputn(value, size);
+	}
 
 protected:
-	// Input sequence (get) ///////////////////////////////////////////////////
+	// Input functions ////////////////////////////////////////////////////////
 
 	/**
         Returns first bit position in accessible input sequence.
@@ -407,7 +397,7 @@ protected:
         m_egptr = gend;
     }
 
-	// Output sequence (put) //////////////////////////////////////////////////
+	// Output functions ///////////////////////////////////////////////////////
 
 	/**
 		Returns first bit position in accessible output sequence.
@@ -470,7 +460,7 @@ protected:
 		m_epptr = pend;
 	}
 
-	// Virutal buffer management and positioning //////////////////////////////
+	// Virtual buffer-management and positioning functions ////////////////////
 
 	/**
 		Set buffer to access.
@@ -594,7 +584,7 @@ protected:
 		return -1;
 	}
 
-	// Virtual input functions(get) ///////////////////////////////////////////
+	// Virtual input functions ////////////////////////////////////////////////
 
 	/**
 		Get number of bits available.
@@ -632,7 +622,7 @@ protected:
 	*/
 	bool underflow(bitfield &value)
 	{
-		return xsgetn_nobump(value, 1) != 0;
+		return xsgetn_nobump(value, 1) == 1;
 	}
 
 	/**
@@ -643,13 +633,13 @@ protected:
 	*/
 	bool uflow(bitfield &value)
 	{
-		const bool gotBit = underflow(value);
-		if (gotBit)
+		const bool got_bit = underflow(value);
+		if (got_bit)
 		{
 			gbump(1);
 		}
 
-		return gotBit;
+		return got_bit;
 	}
 
 	/**
@@ -664,7 +654,7 @@ protected:
 		return false;
 	}
 
-	// Virtual output functions(put) //////////////////////////////////////////
+	// Virtual output functions ///////////////////////////////////////////////
 
 	/**
 		Put sequence of bits.
@@ -697,6 +687,69 @@ protected:
 
 private:
 	/**
+		Process sequence of bits.
+
+		\note This is the typedef for a callback function called exclusively by
+		xsprocessn_nobump().
+
+		\param[in] value Value of bit field.
+		\param[in] mask Mask to isolate bit field in stream, e.g., 0000000111111000.
+		\param[in] shift_amount Number of bit positions mask had to be shifted left, e.g., 4.
+		\param[in] byte_count Number of bytes to be processed for this bit field.
+		\param[in] byte_pointer Pointer to byte containing current bit position.
+	*/
+	typedef void(*process_bits)(bitfield &value, bitfield mask,
+		size_t shift_amount, size_t byte_count, unsigned char *byte_pointer);
+
+	/**
+		Process sequence of bits without advancing pointer.
+
+		\note The get/put pointer is not advanced. Use xsgetn()/xsputn() for that.
+
+		\param[out] value Value of bit field.
+		\param[in] size Number of bits in sequence of bits.
+		\param[in] ptr Position of next bit to process.
+		\param[in] eptr Position of bit after last bit in stream.
+		\param[in] byte_pointer Pointer to byte containing current bit position.
+		\param[in] process_bits_ Callback to process, i.e., get or put, bit field.
+		\return Number of bits processed from buffer or zero if error or eof.
+	*/
+	std::streamsize xsprocessn_nobump(bitfield &value, std::streamsize size,
+		std::streampos ptr, std::streampos eptr, unsigned char *byte_pointer,
+		process_bits process_bits_)
+	{
+		std::streamsize bits_processed = 0;
+
+		if (size > 0 && size <= eptr - ptr)
+		{
+			// Generate "right-justified" mask, e.g., 0000000000111111.
+			bitfield mask = -1;
+			// (Had to break up shift into two parts because shifting the width
+			// of the integral all at once had no effect.)
+			mask <<= size - 1;
+			mask <<= 1;
+			mask = ~mask;
+
+			// Shift left so mask appears at correct location within integral,
+			// e.g., 0000000111111000.
+			const size_t intra_byte_bit_offset = ptr % CHAR_BIT;
+			const size_t shift_amount = (CHAR_BIT - ((size + intra_byte_bit_offset) % CHAR_BIT)) % CHAR_BIT;
+			mask <<= shift_amount;
+
+			// Number of bytes to be processed for this bit field.
+			const size_t byte_count = (static_cast<size_t>(size) + shift_amount + CHAR_BIT - 1) / CHAR_BIT;
+
+			process_bits_(value, mask, shift_amount, byte_count, byte_pointer);
+
+			bits_processed = size;
+		}
+
+		return bits_processed;
+	}
+
+	// Input functions ////////////////////////////////////////////////////////
+
+	/**
 		Get bit at offset relative to gptr().
 
 		\param[in] offset Offset from gptr() to get bit.
@@ -714,27 +767,6 @@ private:
 		}
 
 		return b;
-	}
-
-	/**
-		Get bit at offset relative to gptr().
-
-		\param[in] offset Offset from gptr() to get bit.
-		\param[out] b Value of bit at offset from gptr().
-		\return Whether a bit is returned (eof not encountered).
-	*/
-	bool atgptrb(std::streamoff offset, bitfield &b)
-	{
-		bool got_bit = false;
-
-		if (seekoff(offset, std::ios_base::cur, std::ios_base::in) !=
-			std::streampos(-1))
-		{
-			got_bit = xsgetn_nobump(b, 1) == 1;
-			seekoff(-offset, std::ios_base::cur, std::ios_base::in);
-		}
-
-		return got_bit;
 	}
 
 	/**
@@ -769,75 +801,19 @@ private:
 			m_gptr = new_position = position;
 		}
 
-		BOOST_ASSERT(new_position == std::streampos(-1) ||
-			(new_position >= eback() && new_position <= egptr()));
-
 		return new_position;
 	}
 
 	/**
-		Assure that position is within bounds of accessible output sequence.
+		Get pointer to current input byte.
 
-		\note If bit position is within bounds, use as internal put pointer.
-
-		\param[in] position Candidate for new put position.
-		\return position if valid; otherwise, std::streampos(-1).
-		*/
-	std::streampos assure_valid_put_pointer(std::streampos position)
-	{
-		std::streampos new_position;
-
-		if (position < pbase() || position > epptr())
-		{
-			new_position = std::streampos(-1);
-		}
-		else
-		{
-			m_pptr = new_position = position;
-		}
-
-		BOOST_ASSERT(new_position == std::streampos(-1) ||
-			(new_position >= pbase() && new_position <= epptr()));
-
-		return new_position;
-	}
-
-	/**
-        Get pointer to current input byte.
-
-        \return Pointer to byte containing current input bit position (the next
+		\return Pointer to byte containing current input bit position (the next
 		bit to read).
-    */
-    unsigned char *current_get_byte() const
-    {
-        return &m_buffer[m_gptr / CHAR_BIT];
-    }
-
-	/**
-	Get pointer to current output byte.
-
-	\return Pointer to byte containing current output bit position (the next
-	bit to write).
 	*/
-	unsigned char *current_put_byte() const
+	unsigned char *current_get_byte() const
 	{
-		return &m_buffer[m_pptr / CHAR_BIT];
+		return &m_buffer[m_gptr / CHAR_BIT];
 	}
-
-	/**
-		Process sequence of bits.
-
-		\note This is the typedef for a callback function called exclusively by
-		xsprocessn_nobump().
-
-		\param[in] value Value of bit field.
-		\param[in] mask Mask to isolate bit field in stream, e.g., 0000000111111000.
-		\param[in] shift_amount Number of bit positions mask had to be shifted left, e.g., 4.
-		\param[in] byte_count Number of bytes to be processed for this bit field.
-		\param[in] byte_pointer Pointer to byte containing current bit position.
-	*/
-	typedef void (*process_bits)(bitfield &value, bitfield mask,
-		size_t shift_amount, size_t byte_count, unsigned char *byte_pointer);
 
 	/**
 		Get sequence of bits.
@@ -865,52 +841,6 @@ private:
 	}
 
 	/**
-		Process sequence of bits without advancing pointer.
-
-		\note The get/put pointer is not advanced. Use xsgetn()/xsputn() for that.
-
-		\param[out] value Value of bit field.
-		\param[in] size Number of bits in sequence of bits.
-		\param[in] ptr Position of next bit to process.
-		\param[in] eptr Position of bit after last bit in stream.
-		\param[in] byte_pointer Pointer to byte containing current bit position.
-		\param[in] process_bits_ Callback to process, i.e., get or put, bit field.
-		\return Number of bits processed from buffer or zero if error or eof.
-		*/
-	std::streamsize xsprocessn_nobump(bitfield &value, std::streamsize size,
-		std::streampos ptr, std::streampos eptr, unsigned char *byte_pointer,
-		process_bits process_bits_)
-	{
-		std::streamsize bits_processed = 0;
-
-		if (size > 0 && size <= eptr - ptr)
-		{
-			// Generate "right-justified" mask, e.g., 0000000000111111.
-			bitfield mask = -1;
-			// (Had to break up shift into two parts because shifting the width
-			// of the integral all at once had no effect.)
-			mask <<= size - 1;
-			mask <<= 1;
-			mask = ~mask;
-
-			// Shift left so mask appears at correct location within integral,
-			// e.g., 0000000111111000.
-			const size_t intra_byte_bit_offset = ptr % CHAR_BIT;
-			const size_t shift_amount = (CHAR_BIT - ((size + intra_byte_bit_offset) % CHAR_BIT)) % CHAR_BIT;
-			mask <<= shift_amount;
-
-			// Number of bytes to be processed for this bit field.
-			const size_t byte_count = (static_cast<size_t>(size) + shift_amount + CHAR_BIT - 1) / CHAR_BIT;
-
-			process_bits_(value, mask, shift_amount, byte_count, byte_pointer);
-
-			bits_processed = size;
-		}
-
-		return bits_processed;
-	}
-
-	/**
 		Get sequence of bits without advancing pointer.
 
 		\note The get pointer is not advanced. Use xsgetn() for that.
@@ -923,6 +853,43 @@ private:
 	{
 		return xsprocessn_nobump(value, size, gptr(), egptr(),
 			current_get_byte(), get_bits_callback);
+	}
+
+	// Output functions ///////////////////////////////////////////////////////
+
+	/**
+		Assure that position is within bounds of accessible output sequence.
+
+		\note If bit position is within bounds, use as internal put pointer.
+
+		\param[in] position Candidate for new put position.
+		\return position if valid; otherwise, std::streampos(-1).
+		*/
+	std::streampos assure_valid_put_pointer(std::streampos position)
+	{
+		std::streampos new_position;
+
+		if (position < pbase() || position > epptr())
+		{
+			new_position = std::streampos(-1);
+		}
+		else
+		{
+			m_pptr = new_position = position;
+		}
+
+		return new_position;
+	}
+
+	/**
+		Get pointer to current output byte.
+
+		\return Pointer to byte containing current output bit position (the next
+		bit to write).
+	*/
+	unsigned char *current_put_byte() const
+	{
+		return &m_buffer[m_pptr / CHAR_BIT];
 	}
 
 	/**
@@ -941,7 +908,7 @@ private:
 	{
 		mask = ~mask;
 		value <<= shift_amount;
-		for (size_t i = byte_count - 1;; --i, mask >>= CHAR_BIT, value >>= CHAR_BIT)
+		for (size_t i = byte_count - 1; ; --i, mask >>= CHAR_BIT, value >>= CHAR_BIT)
 		{
 			byte_pointer[i] &= mask;
 			byte_pointer[i] |= value;
@@ -967,6 +934,15 @@ private:
 			current_put_byte(), put_bits_callback);
 	}
 
+	// Input variables ////////////////////////////////////////////////////////
+
+	/**
+		Beginning of accessible input sequence.
+
+		\note Not currently used. Always 0, which is first bit in first byte.
+	*/
+	std::streampos m_eback;
+
 	/**
         Current bit position in buffer.
 
@@ -985,12 +961,14 @@ private:
     */
     std::streampos m_egptr;
 
-    /**
-        Beginning of accessible input sequence.
+	// Output variables ////////////////////////////////////////////////////////
 
-        \note Not currently used. Always 0, which is first bit in first byte.
-    */
-    std::streampos m_eback;
+	/**
+		Beginning of accessible output sequence.
+
+		\note Not currently used. Always 0, which is first bit in first byte.
+	*/
+	std::streampos m_pbase;
 
 	/**
 		Current bit position in buffer.
@@ -1010,12 +988,7 @@ private:
 	*/
 	std::streampos m_epptr;
 
-	/**
-		Beginning of accessible output sequence.
-
-		\note Not currently used. Always 0, which is first bit in first byte.
-	*/
-	std::streampos m_pbase;
+	// Buffer-management variables ////////////////////////////////////////////
 
     /**
         Pointer to first byte of char array containing the bits.
@@ -1146,8 +1119,7 @@ public:
     */
     void setstate(std::ios_base::iostate state)
     {
-		// TBD If no stream buffer, set badbit flag.
-        m_state |= state;
+        clear(rdstate() | state);
     }
 
     /**
@@ -1158,7 +1130,12 @@ public:
     void clear(std::ios_base::iostate state = std::ios_base::goodbit)
     {
         m_state = state;
-    }
+
+		if (rdbuf() == NULL)
+		{
+			badbit();
+		}
+	}
 
     /**
         Get the bitbuf object currently associated with the stream.
@@ -1177,11 +1154,10 @@ public:
     */
     bitbuf *rdbuf(bitbuf *bb)
     {
-        bitbuf *previous_bitbuf = m_bitbuf;
+        bitbuf *previous_bitbuf = rdbuf();
 		init(bb);
         return previous_bitbuf;
     }
-
 #if 0
     /**
         Get tied stream.
@@ -1190,6 +1166,7 @@ public:
     */
     ostream *tie() const
     {
+		// TBD Implement the two tie() function overloads.
         return NULL;
     }
 
@@ -1203,7 +1180,6 @@ public:
         return NULL;
     }
 #endif
-
 protected:
     /*
         Constructor.
@@ -1223,7 +1199,7 @@ protected:
     void init(bitbuf *bb)
     {
         m_bitbuf = bb;
-        m_state = bb == 0 ? std::ios_base::badbit : std::ios_base::goodbit;
+        clear(std::ios_base::goodbit);
     }
 
     /**

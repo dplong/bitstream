@@ -125,7 +125,6 @@ public:
     */
     istream &ignore(std::streamsize bits = 1)
     {
-		// TBD Need to find a way to ignore either input or output stream.
         if (rdbuf()->pubseekoff(bits, std::ios_base::cur, std::ios_base::in) == std::streampos(-1))
         {
             eofbit();
@@ -147,8 +146,6 @@ public:
     */
     istream &aligng(size_t bit)
     {
-        BOOST_ASSERT(bit > 0);
-
         if (good() && bit > 0)
         {
             seekg(((static_cast<size_t>(tellg()) + bit - 1) / bit) * bit);
@@ -232,9 +229,7 @@ public:
     */
     istream &read(bitfield &value, std::streamsize bits)
     {
-        BOOST_ASSERT(bits >= 0);
-
-        BOOST_AUTO(bits_read, rdbuf()->sgetn(value, bits));
+		std::streamsize bits_read = rdbuf()->sgetn(value, bits);
         if (bits_read != bits)
         {
 			// This read failed. Was it because there aren't enough available bits?
@@ -274,8 +269,6 @@ public:
     */
     istream &readsome(bitfield &value, std::streamsize bits)
     {
-        BOOST_ASSERT(bits >= 0);
-
         return read(value, bits);
     }
 
@@ -289,7 +282,29 @@ public:
 	*/
 	istream& putback(bitfield value)
 	{
-		// TBD Implement putback().
+// http://en.cppreference.com/w/cpp/io/basic_istream/putback says do this:
+#if 0
+		clear(rdstate() & ~std::ios_base::eofbit);
+		if (rdbuf() == NULL || !rdbuf()->sputbackb(value))
+		{
+			setstate(std::ios_base::badbit);
+		}
+// while http://www.cplusplus.com/reference/istream/basic_istream/putback/ says do this this:
+#else
+		if (eof())
+		{
+			failbit();
+		}
+		else
+		{
+			if (!rdbuf()->sputbackb(value))
+			{
+				badbit();
+			}
+		}
+#endif
+		m_gcount = 0;
+
 		return *this;
 	}
 
@@ -482,7 +497,7 @@ inline istream &operator>>(istream &ibs, bool &b)
 */
 inline istream &operator>>(istream &ibs, const bool &b)
 {
-	BOOST_TYPEOF(b) value;
+	bool value;
 	ibs >> value;
 	if (b != value)
     {
